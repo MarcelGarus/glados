@@ -1,14 +1,24 @@
-Testing is tedious!
-At least that's what I thought before I stumbled over property-based testing – a simple approach that allows you to write less tests yet gain more confidence in your code.
+<!--<img style="float: right;" src="whatever.jpg">-->
+
+Testing is tedious! 🍰
+At least that's what I thought before I stumbled over **property-based testing** – a simple approach that allows you to write less tests yet gain more confidence in your code.
 
 Instead of defining concrete inputs and testing whether they result in the desired output, you define certain conditions that are always true (also called *invariants*).
-In mathematics, there's the ∀ operator for that. In Dart, there's `glados`.
+In mathematics, there's the ∀ operator for that. In Dart, now there's `glados`.
 
 ```yml
 dev_dependencies:
   test: ...
   glados: ...
 ```
+
+- [Getting started](#getting-started)
+- [Strengths](#strengths)
+- [How does it work?](#how-does-it-work)
+- [Creating a custom Arbitrary](#creating-a-custom-arbitrary)
+- [More fine-grained arbitraries](#more-fine-grained-arbitraries)
+- [What's up with the name?](#whats-up-with-the-name)
+- [Further info & resources](#further-info--resources)
 
 ## Getting started
 
@@ -33,7 +43,7 @@ test('maximum of non-empty list', () {
 });
 ```
 
-> If you're not familiar with the syntax of the [`test`](https://pub.dev/packages/test) package, you should read [their documentation](https://pub.dev/packages/test) first.
+> If you're not familiar with the syntax of the [`test`](https://pub.dev/packages/test) package, you should read [its docs](https://pub.dev/packages/test) first.
 
 Executing `pub run test path/to/tests.dart` should show that the second test fails.
 
@@ -50,12 +60,12 @@ glados<List<int>>('maximum is only null if the list is empty', (list) {
 
 You can use the `glados` function whereever you would use the `test` function.
 `glados` then tests your code with a variety of inputs and all of them need to succeed.
-The `glados` function also takes a generic type parameter describing which values to generate – in this case, `List<int>`.
+The `glados` function also takes a generic type parameter describing which values to generate – in this case, `List<int>`. Btw, you can also use `glados2` if you need two input values or `glados3` if you need three.
 
 Running the test should produce something like this:
 
 ```txt
-Tested 1 inputs, shrunk 25 times.
+Tested 1 input, shrunk 25 times.
 Failing for input: [0]
 ...
 ```
@@ -124,8 +134,14 @@ glados<List<int>>('maximum is in the list', (list) {
 I'll leave implementing the function correctly to you, the reader.
 
 But whatever solution you come up with, it'll be correct:
-Our tests aren't merely some arbitrary examples that we came up with anymore.
+Our tests aren't merely some arbitrary examples anymore.
 Rather, they correspond to the **actual mathematical definition of max**.
+
+## Strengths
+
+- ⚡ You have to write fewer tests.
+- 💪🏻 You increase confidence in your code.
+- 🤯 You develop a better understanding for the problem.
 
 ## How does it work?
 
@@ -180,7 +196,15 @@ final userArbitrary = UserArbitrary(stringArbitrary, intArbitrary);
 gladosArbitraries.add(userArbitrary);
 ```
 
-It's best practice to make arbitraries that are internally used in another arbitrary configurable so that you can customize them if needed.
+If you use arbitraries in another arbitrary, it's best practice to make them configurable so that you can customize them if needed.
+
+## More fine-grained arbitraries
+
+Sometimes, types are not precise enough to express the constraints. For example, when testing a function that accepts email addresses, it may be inefficient to use the normal `stringArbitrary` – most of the inputs probably fail early on in the test.
+
+So, for those cases, you should create a new semantic adapter – i.e. an `EmailArbitrary` or a `Base64Arbitrary`.
+
+The `glados` call accepts an `arbitrary` parameter, so you can pass a custom arbitrary if you need to.
 
 ## What's up with the name?
 
@@ -188,7 +212,7 @@ GLaDOS is a very nice robot in the Portal game series.
 She's the head of the Aperture Science Laboratory facilities, where she spends the rest of her days testing.
 So I thought that's quite a fitting name. 🍰
 
-## Further info
+## Further info & resources
 
 - [Here's the talk](https://www.youtube.com/watch?v=IYzDFHx6QPY) that got me into property-based testing.
 - [This article](https://begriffs.com/posts/2017-01-14-design-use-quickcheck.html) covers the topic in more detail.

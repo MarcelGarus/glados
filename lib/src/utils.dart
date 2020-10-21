@@ -35,7 +35,9 @@ class NoArbitraryFound implements Exception {
       'But no arbitrary was found for this type. You should probably create '
       'a new Arbitrary<$type> and either register that using '
       'gladosArbitraries.add(instanceOfTheArbitrary) or use it directly by '
-      'passing it into the named arbitrary parameter of the glados function.';
+      'passing it into the named arbitrary parameter of the glados function.\n'
+      'For more information on implementing your own arbitrary, have a look at '
+      'https://pub.dev/packages/glados#creating-a-custom-arbitrary.';
 }
 
 /// For the same input, an invariance sometimes throws an exceptions and

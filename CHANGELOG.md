@@ -1,3 +1,9 @@
+## 0.0.4
+
+- Improve readme.
+- Add several arbitraries for `Null`, `bool`, `int`, `double`, `num`, `BigInt`, `DateTime`, `Duration`, `Set`, `List`, `MapEntry`, `Map`.
+- Improve errors.
+
 ## 0.0.3
 
 - Improve readme.
