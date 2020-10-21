@@ -87,6 +87,7 @@ Running the tests produces the following result:
 ```txt
 Tested 35 inputs, shrunk 117 times.
 Failing for input: [43]
+...
 ```
 
 `glados` detected that the invariant breaks if the input is a list containing only `43`.

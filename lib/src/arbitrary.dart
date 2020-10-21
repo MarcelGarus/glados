@@ -1,15 +1,27 @@
 import 'dart:math';
 
+/// An [Arbitrary] that makes it possible to use glados to test type [T].
 abstract class Arbitrary<T> {
+  /// Should generate a new value of type [T] with about the given [size].
+  /// The [random] instance should be used for all pseudo-random values.
   T generate(Random random, int size);
+
+  /// Should generate an [Iterable] of values that are similar and simpler than
+  /// the given [value]. Simpler means that the transitive hull is finite: If
+  /// you would call shrink on all returned values and on the values returned by
+  /// them etc., this process should terminate sometime.
   Iterable<T> shrink(T value);
 }
 
+/// The arbitraries that glados uses when no explicit arbitrary is passed.
 final gladosArbitraries = <Arbitrary<dynamic>>{
   intArbitrary,
   listOfIntArbitrary,
 };
 
+/// An Arbitrary that generates N other arbitraries.
+/// This is non-type-safe by design – otherwise we'd need Arbitrary2,
+/// Arbitrary3 etc.
 class ArbitraryN extends Arbitrary<List<dynamic>> {
   ArbitraryN(this.arbitraries);
 
@@ -33,6 +45,7 @@ class ArbitraryN extends Arbitrary<List<dynamic>> {
   }
 }
 
+/// An arbitrary for integers.
 class IntArbitrary implements Arbitrary<int> {
   @override
   int generate(Random random, int size) => random.nextInt(2 * size + 1) - size;
@@ -53,6 +66,7 @@ class IntArbitrary implements Arbitrary<int> {
 
 final intArbitrary = IntArbitrary();
 
+/// An arbitrary for lists.
 class ListArbitrary<T> implements Arbitrary<List<T>> {
   ListArbitrary(this.arbitrary);
 

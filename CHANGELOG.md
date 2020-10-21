@@ -1,3 +1,8 @@
+## 0.0.3
+
+- Improve readme.
+- Improve doc comments.
+
 ## 0.0.2
 
 - Add `glados2` and `glados3` for testing with multiple input parameters.

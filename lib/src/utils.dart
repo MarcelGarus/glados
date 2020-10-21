@@ -1,5 +1,10 @@
+/// A function with one input that's intended to be called in a test context.
 typedef Tester<T> = void Function(T input);
+
+/// A function with two inputs that's intended to be called in a test context.
 typedef Tester2<A, B> = void Function(A firstInput, B secondInput);
+
+/// A function with three inputs that's intended to be called in a test context.
 typedef Tester3<A, B, C> = void Function(
     A firstInput, B secondInput, C thirdInput);
 
@@ -33,6 +38,8 @@ class NoArbitraryFound implements Exception {
       'passing it into the named arbitrary parameter of the glados function.';
 }
 
+/// For the same input, an invariance sometimes throws an exceptions and
+/// sometimes doesn't. Invariants should be deterministic though.
 class InvarianceNotDeterministic implements Exception {
   String toString() => 'The invariance was called twice with the same value. '
       'The first time, an exception was thrown, the second time, it executed '
