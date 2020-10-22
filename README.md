@@ -1,6 +1,6 @@
 <!--<img style="float: right;" src="whatever.jpg">-->
 
-Testing is tedious! 🍰
+Testing is tedious!
 At least that's what I thought before I stumbled over **property-based testing** – a simple approach that allows you to write less tests yet gain more confidence in your code.
 
 Instead of defining concrete inputs and testing whether they result in the desired output, you define certain conditions that are always true (also called *invariants*).

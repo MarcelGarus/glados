@@ -1,3 +1,5 @@
+import 'dart:math';
+
 /// A function with one input that's intended to be called in a test context.
 typedef Tester<T> = void Function(T input);
 
@@ -12,6 +14,10 @@ typedef Tester3<A, B, C> = void Function(
 class Statistics {
   var exploreCounter = 0;
   var shrinkCounter = 0;
+}
+
+extension ChoosingRandomly on Random {
+  T choose<T>(List<T> list) => list[nextInt(nextInt(list.length))];
 }
 
 /// Runs the [tester] with the [input]. Catches thrown errors and instead

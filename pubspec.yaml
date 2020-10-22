@@ -9,3 +9,4 @@ environment:
 
 dependencies:
   test: ^1.0.0
+  meta: any
