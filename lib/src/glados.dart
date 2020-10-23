@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import 'package:meta/meta.dart';
-import 'package:test/test.dart' as testPackage;
+import 'package:test/test.dart' as test_package;
 
 import 'any.dart';
 import 'utils.dart';
@@ -154,7 +154,7 @@ class Glados<T> {
       return input;
     }
 
-    testPackage.test(
+    test_package.test(
       '$name (testing ${explore.numRuns} '
       '${explore.numRuns == 1 ? 'input' : 'inputs'})',
       () {
