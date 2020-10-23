@@ -1,3 +1,11 @@
+## 0.1.0
+
+- Redesign API: Syntax is now `Glados<...>().test(...)`. The `any` provides a namespace for all `Arbitrary`s.
+- Improve readme and describe customization options.
+- Improve console output.
+- Add several arbitraries for `lowercaseLetters`, `uppercaseLetters`, `letters`, `digits`.
+- Make errors more helpful by providing call to actions.
+
 ## 0.0.4
 
 - Improve readme.
@@ -13,7 +21,7 @@
 
 - Add `glados2` and `glados3` for testing with multiple input parameters.
 - Improve readme.
-- Improve output.
+- Improve console output.
 - Add doc comments.
 
 ## 0.0.1

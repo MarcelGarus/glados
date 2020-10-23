@@ -33,8 +33,11 @@ void main() {
         }
       }
     });
-    Glados2(any.lowercaseLetter, any.uppercaseLetter).test('letters', (a, b) {
-      expect(a.length, greaterThanOrEqualTo(b.length));
-    });
+    // Glados2(any.lowercaseLetter, any.uppercaseLetter).test('letters', (a, b) {
+    //   expect(a.length, greaterThanOrEqualTo(b.length));
+    // });
+    Glados<User>().test('blub', (user) {});
   });
 }
+
+class User {}

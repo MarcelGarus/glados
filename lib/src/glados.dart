@@ -155,7 +155,7 @@ class Glados<T> {
     }
 
     testPackage.test(
-      '$name (🍰 testing ${explore.numRuns} '
+      '$name (testing ${explore.numRuns} '
       '${explore.numRuns == 1 ? 'input' : 'inputs'})',
       () {
         final errorInducingInput = explorePhase();

@@ -37,13 +37,37 @@ class NoArbitraryFound implements Exception {
 
   final Type type;
 
-  String toString() => 'You tried to call glados with $type as type arguments. '
-      'But no arbitrary was found for this type. You should probably create '
-      'a new Arbitrary<$type> and either register that using '
-      'gladosArbitraries.add(instanceOfTheArbitrary) or use it directly by '
-      'passing it into the named arbitrary parameter of the glados function.\n'
-      'For more information on implementing your own arbitrary, have a look at '
-      'https://pub.dev/packages/glados#creating-a-custom-arbitrary.';
+  String toString() => 'You tried to create a Glados instance with "$type" as\n'
+      'a type argument. But no arbitrary was found for $type.\n'
+      '\n'
+      'You should specify which arbitrary to use. Here are a few options:\n'
+      '\n'
+      '- Explicitly use a predefined arbitrary, for example like this:\n'
+      "    Glados(any.lowercaseLetters).test('blub', (input) { ... });\n"
+      // "- Check if there's a glados package for ${type}. For example, for the\n"
+      // "  package tuple, there's the tuple_glados package, which contains\n"
+      // '  arbitraries for the types defined in tuples.\n'
+      // '  By the way, you can also add the following to your\n'
+      // '  analysis_options.yaml to get automatic hints for available glados\n'
+      // '  packages for types in your glados tests:\n'
+      // '    ...\n'
+      // '- Automatically generate an Arbitrary<$type> by annotating the $type\n'
+      // '  class with @GenerateGladosArbitrary and running the following command\n'
+      // '  in the command line:\n'
+      // '    \$> pub run build_runner build\n'
+      '- Create a new arbitrary manually:\n'
+      '    extension ${type}Arbitrary on Any {\n'
+      '      Arbitrary<${type}> get ${type.toString().toLowerCase()} => arbitrary(\n'
+      '        generate: (random, size) => /* code for generating a ${type} */,\n'
+      '        shrink: (input) => /* code for shrinking the input */,\n'
+      '      );\n'
+      '    }\n'
+      '  Then, either use the arbitrary directly:\n'
+      "    Glados(any.${type.toString().toLowerCase()}).test('blub', () { ... });\n"
+      '  Or register the arbitrary as the default arbitrary for ${type}s:\n'
+      '    Any.setDefault<$type>(any.${type.toString().toLowerCase()});\n'
+      '  For more information on implementing your own arbitrary, have a look at\n'
+      '  https://pub.dev/packages/glados#creating-a-custom-arbitrary.';
 }
 
 /// For the same input, an invariance sometimes throws an exceptions and

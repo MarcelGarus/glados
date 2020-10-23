@@ -15,8 +15,11 @@ dev_dependencies:
 - [Getting started](#getting-started)
 - [Strengths](#strengths)
 - [How does it work?](#how-does-it-work)
-- [Creating a custom Arbitrary](#creating-a-custom-arbitrary)
-- [More fine-grained arbitraries](#more-fine-grained-arbitraries)
+- [Customizing Glados testing](#customizing-glados-testing)
+  - [Multiple inputs](#multiple-inputs)
+  - [Arbitraries](#arbitraries)
+  - [Custom Arbitraries](#custom-arbitraries)
+  - [Explore](#explore)
 - [What's up with the name?](#whats-up-with-the-name)
 - [Further info & resources](#further-info--resources)
 
@@ -43,7 +46,7 @@ test('maximum of non-empty list', () {
 });
 ```
 
-> If you're not familiar with the syntax of the [`test`](https://pub.dev/packages/test) package, you should read [its docs](https://pub.dev/packages/test) first.
+> Not familiar with the syntax of the [`test`](https://pub.dev/packages/test) package? [Here are the docs](https://pub.dev/packages/test).
 
 Executing `pub run test path/to/tests.dart` should show that the second test fails.
 
@@ -51,16 +54,17 @@ In property-based testing, you look for invariants – conditions that should be
 For example, if `max` produces `null`, the list should be empty:
 
 ```dart
-glados<List<int>>('maximum is only null if the list is empty', (list) {
+Glados<List<int>>().test('maximum is only null if the list is empty', (list) {
   if (max(list) == null) {
     expect(list, isEmpty);
   }
 });
 ```
 
-You can use the `glados` function whereever you would use the `test` function.
-`glados` then tests your code with a variety of inputs and all of them need to succeed.
-The `glados` function also takes a generic type parameter describing which values to generate – in this case, `List<int>`. Btw, you can also use `glados2` if you need two input values or `glados3` if you need three.
+You can create a `Glados` instance and call it's `test` method instead of using the normal `test` function.
+`Glados` takes a generic type parameter – in this case, `List<int>`.
+It then tests your code with a variety of inputs of that type.
+All of them need to succeed for the whole test to succeed.
 
 Running the test should produce something like this:
 
@@ -70,7 +74,7 @@ Failing for input: [0]
 ...
 ```
 
-`glados` discovered that the a list containing `0` breaks the condition!
+Glados discovered that a list containing `0` breaks the condition!
 
 Let's modify our `max` function to pass this test:
 
@@ -82,7 +86,7 @@ We need to add another invariant to reject this function as well.
 Arguably the most obvious invariant for `max` is that the result should be greater than or equal to all items of the list:
 
 ```dart
-glados<List<int>>('maximum is >= all items', (list) {
+Glados<List<int>>().test('maximum is >= all items', (list) {
   var maximum = max(list);
   if (maximum != null) {
     for (var item in list) {
@@ -100,7 +104,7 @@ Failing for input: [43]
 ...
 ```
 
-`glados` detected that the invariant breaks if the input is a list containing only `43`.
+Glados detected that the invariant breaks if the input list contains a `43`.
 
 Let's actually add a more reasonable implementation for `max`:
 
@@ -123,7 +127,7 @@ This fixes the tests, but still doesn't work for lists containing only negative 
 So, let's add a final test:
 
 ```dart
-glados<List<int>>('maximum is in the list', (list) {
+Glados<List<int>>().test('maximum is in the list', (list) {
   var maximum = max(list);
   if (maxmium != null) {
     expect(list, contains(maximum));
@@ -141,70 +145,112 @@ Rather, they correspond to the **actual mathematical definition of max**.
 
 - ⚡ You have to write fewer tests.
 - 💪🏻 You increase confidence in your code.
-- 🤯 You develop a better understanding for the problem.
+- 🤯 You develop a better understanding for the problem domain.
 
 ## How does it work?
 
-`glados` works in two phases:
+Glados works in two phases:
 
-- **The exploration phase**: `glados` generates increasingly complex, random inputs until one breaks the invariant or the maximum number of tries is reached.
-- **The shrinking phase**: This phase only happens if `glados` found an input that breaks the invariant. In this case, the input is gradually simplified and the smallest input that's still breaking the invariant is returned.
+- **The exploration phase**: Glados generates increasingly complex, random inputs until one breaks the invariant or the maximum number of runs is reached.
+- **The shrinking phase**: This phase only happens if Glados found an input that breaks the invariant. In this case, the input is gradually simplified and the smallest input that's still breaking the invariant is returned.
 
-Both phases internally use the `Arbitrary<T>` class, which has two methods:
+## Customizing Glados testing
 
-- `T generate(Random random, int size)` generates a new value of type `T`, using the `random` generator for random values. The `size` argument should be used as a rough estimate on how big or complex the returned value should be. For example, for a given size *n*, the `intArbitrary` produces `int`s from *-n* to *n*.
-- `Iterable<T> shrink(T input)` takes a value and returns an `Iterable` containing similar, but smaller values. Smaller means that calling `shrink` repeatedly on the smaller values and their children etc., the program should eventually terminate (aka the transitive hull with regard to `shrink` should be finite).
+### Multiple inputs
 
-`glados` looks for a fitting arbitrary in the global variable `gladosArbitraries` and then uses that to generate and shrink values.
-
-## Creating a custom Arbitrary
-
-The basic types all have corresponding `Arbitrary`s implemented. If you want to use a custom type, you need to create a custom arbitrary and register it:
+You can use `Glados2` and `Glados3` for Glados tests with multiple inputs.
+If you need support for more inputs, don't hestitate to [open an issue](https://github.com/marcelgarus/glados/issues/new).
 
 ```dart
-// Assuming User consists of name (String) and age (int).
-class UserArbitrary extends Arbitrary<User> {
-  UserArbitrary(this.nameArbitrary, this.ageArbitray);
-  
-  final Arbitrary<String> nameArbitrary;
-  final Arbitrary<int> ageArbitrary;
-
-  @override
-  List<T> generate(Random random, int size) {
-    return User(
-      name: nameArbitrary.generate(random, size),
-      age: ageArbitrary.generate(random, size),
-    );
-  }
-
-  @override
-  Iterable<List<T>> shrink(List<T> value) sync* {
-    yield User(
-      name: nameArbitrary.shrink(value.name),
-      age: value.age,
-    );
-    yield User(
-      name: value.name,
-      age: ageArbitrary.shrink(value.age),
-    );
-  }
-}
-
-final userArbitrary = UserArbitrary(stringArbitrary, intArbitrary);
-
-// in the main method
-gladosArbitraries.add(userArbitrary);
+Glados2<int, int>().test('complicated stuff', (a, b) {
+  ...
+})
 ```
 
-If you use arbitraries in another arbitrary, it's best practice to make them configurable so that you can customize them if needed.
+### Arbitraries
 
-## More fine-grained arbitraries
+`Arbitrary`s are responsible for generating and shrinking values. They have two methods:
 
-Sometimes, types are not precise enough to express the constraints. For example, when testing a function that accepts email addresses, it may be inefficient to use the normal `stringArbitrary` – most of the inputs probably fail early on in the test.
+- `T generate(Random random, int size)` generates a new value of type `T`, using `random` as a source for randomness. The `size` argument is used as a rough estimate on how big or complex the returned value should be.  
+  For example, the `Arbitrary` for `int` produces `int`s in the range from `-size` to `size`.
+- `Iterable<T> shrink(T input)` takes a value and returns an `Iterable` containing similar, but smaller values. Smaller means that calling `shrink` repeatedly on the smaller values and their children etc., the program should eventually terminate (aka the transitive hull with regard to `shrink` should be finite and acyclic).
 
-So, for those cases, you should create a new semantic adapter – i.e. an `EmailArbitrary` or a `Base64Arbitrary`.
 
-The `glados` call accepts an `arbitrary` parameter, so you can pass a custom arbitrary if you need to.
+The basic types all have corresponding `Arbitrary`s implemented.
+
+Glados also accepts an optional `Arbitrary` that can be used to customize the input values.
+Also, there's `any`, which provides a namespace for `Arbitrary`s.
+
+For example, if you want to test some code only with lowercase letters, you can write:
+
+```dart
+Glados(any.lowercaseLetters).test('text test', (text) { ... });
+```
+
+### Custom Arbitraries
+
+Sometimes it makes sense to create custom `Arbitrary`s.
+
+For example, if you test code that expects email addresses, it may be inefficient to test the code with random `String`s; if the tested code contains some sanity checks at the beginning, only a tiny fraction of values actually passes through the rest of the code.
+
+In that case, create a custom `Arbitrary`.
+To do that, add an extension on `Any`, which is a namespace for `Arbitrary`s:
+
+```dart
+extension EmailArbitrary on Any {
+  Arbitrary<String> get email => arbitrary(
+    generate: (random, size) => /* code for generating emails */,
+    shrink: (input) => /* code for shrinking the given email */,
+  );
+}
+```
+
+Then, you can use that `Arbitrary` like this:
+
+```dart
+Glados(any.email).test('email test', (email) { ... });
+```
+
+If you create an `Arbitrary` for a type that doesn't have an `Arbitrary` yet (or you want to swap out a built-in `Arbitrary` for some reason), you can set it as the default for that type:
+
+```dart
+// Use the email arbitrary for all Strings.
+Any.setDefault<String>(any.email);
+```
+
+Then, you don't need to explicitly provide the `Arbitrary` to `Glados` anymore. Instead, `Glados` will use it based on given type parameters:
+
+```dart
+// This will now use the any.email arbitrary, because it was set as the
+// default for String before.
+Glados<String>().test('blub', () { ... });
+```
+
+<!--
+TODO:
+- code generation for arbitraries
+- package ecosystem arbitrary support
+-->
+
+### Explore
+
+You can also customize the exploration phase.
+To do that, you can use `Explore`, which is a configuration for certain values used during that phase.
+
+For example, if you want to test some code with very big inputs, you might adjust `Explore`'s parameters so that Glados starts with very big inputs and generates much bigger inputs after just a few runs:
+
+```dart
+Glados(any.email, Explore(
+  initialSize: 100, // Start quite big
+  speed: 10,        // and increase the input size by 10 each run,
+  numRuns: 10,      // but only do 10 runs instead of 100.
+)).test('my test', (input) {
+  ...
+});
+```
+
+`Explore` also has a `random` parameter, which you can provide with a custom `Random` instance.
+By default, `Explore` uses a `Random` instance created with a fixed seed so that your tests are deterministic.
 
 ## What's up with the name?
 
