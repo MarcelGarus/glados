@@ -22,6 +22,22 @@ extension PredefinedAnys on Any {
           }
         },
       );
+  Arbitrary<core.int> get positiveInt => arbitrary(
+        generate: (random, size) => random.nextInt(size - 1) + 1,
+        shrink: (input) => input > 1 ? [input - 1] : [],
+      );
+  Arbitrary<core.int> get positiveIntOrZero => arbitrary(
+        generate: (random, size) => random.nextInt(size),
+        shrink: (input) => input > 0 ? [input - 1] : [],
+      );
+  Arbitrary<core.int> get negativeInt => arbitrary(
+        generate: (random, size) => -random.nextInt(size - 1) - 1,
+        shrink: (input) => input < -1 ? [input + 1] : [],
+      );
+  Arbitrary<core.int> get negativeIntOrZero => arbitrary(
+        generate: (random, size) => -random.nextInt(size),
+        shrink: (input) => input < 0 ? [input + 1] : [],
+      );
   Arbitrary<core.double> get double => arbitrary(
         generate: (random, size) => random.nextDouble() * 2 * size - size,
         shrink: (input) sync* {
@@ -73,17 +89,35 @@ extension PredefinedAnys on Any {
               itemArbitrary.generate(random, size),
           ];
         },
-        shrink: (value) sync* {
-          for (var i = 0; i < value.length; i++) {
-            yield core.List.of(value)..removeAt(i);
+        shrink: (list) sync* {
+          for (var i = 0; i < list.length; i++) {
+            yield core.List.of(list)..removeAt(i);
           }
-          for (var i = 0; i < value.length; i++) {
-            for (final shrunk in itemArbitrary.shrink(value[i])) {
-              yield core.List.of(value)..[i] = shrunk;
+          for (var i = 0; i < list.length; i++) {
+            for (final shrunk in itemArbitrary.shrink(list[i])) {
+              yield core.List.of(list)..[i] = shrunk;
             }
           }
         },
       );
+  Arbitrary<core.List<T>> nonEmptyList<T>(Arbitrary<T> itemArbitrary) =>
+      arbitrary(generate: (random, size) {
+        final length = random.nextInt(size - 1) + 1;
+        return <T>[
+          for (var i = 0; i < length; i++) itemArbitrary.generate(random, size),
+        ];
+      }, shrink: (list) sync* {
+        if (list.length > 1) {
+          for (var i = 0; i < list.length; i++) {
+            yield core.List.of(list)..removeAt(i);
+          }
+        }
+        for (var i = 0; i < list.length; i++) {
+          for (final shrunk in itemArbitrary.shrink(list[i])) {
+            yield core.List.of(list)..[i] = shrunk;
+          }
+        }
+      });
   Arbitrary<core.Set<T>> set<T>(Arbitrary<T> elementArbitrary) => arbitrary(
         generate: (random, size) {
           final additions = random.nextInt(size);

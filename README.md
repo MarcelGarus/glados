@@ -1,9 +1,10 @@
-<!--<img style="float: right;" src="whatever.jpg">-->
+<img style="float: right;width: 300px;" src="glados.webp">
 
 Testing is tedious!
-At least that's what I thought before I stumbled over **property-based testing** – a simple approach that allows you to write less tests yet gain more confidence in your code.
+At least that's what I thought before I stumbled over **property-based testing** – a simple approach that allows you to write fewer tests yet gain more confidence in your code.
 
-Instead of defining concrete inputs and testing whether they result in the desired output, you define certain conditions that are always true (also called *invariants*).
+In traditional testing, you define concrete inputs and test whether they result in the desired output.
+In property based testing, you define certain conditions that are always true for any input (those are also called *invariants*).
 In mathematics, there's the ∀ operator for that. In Dart, now there's `glados`.
 
 ```yml
@@ -12,16 +13,21 @@ dev_dependencies:
   glados: ...
 ```
 
+<details>
+<summary>Table of Contents</summary>
+
 - [Getting started](#getting-started)
 - [Strengths](#strengths)
 - [How does it work?](#how-does-it-work)
-- [Customizing Glados testing](#customizing-glados-testing)
+- [Advanced Glados testing](#advanced-glados-testing)
   - [Multiple inputs](#multiple-inputs)
   - [Arbitraries](#arbitraries)
   - [Custom Arbitraries](#custom-arbitraries)
   - [Explore](#explore)
 - [What's up with the name?](#whats-up-with-the-name)
 - [Further info & resources](#further-info--resources)
+
+</details>
 
 ## Getting started
 
@@ -61,7 +67,7 @@ Glados<List<int>>().test('maximum is only null if the list is empty', (list) {
 });
 ```
 
-You can create a `Glados` instance and call it's `test` method instead of using the normal `test` function.
+Just create a `Glados` instance and call its `test` method instead of using the normal `test` function.
 `Glados` takes a generic type parameter – in this case, `List<int>`.
 It then tests your code with a variety of inputs of that type.
 All of them need to succeed for the whole test to succeed.
@@ -74,7 +80,7 @@ Failing for input: [0]
 ...
 ```
 
-Glados discovered that a list containing `0` breaks the condition!
+Glados discovered that a list with some content breaks the condition!
 
 Let's modify our `max` function to pass this test:
 
@@ -83,18 +89,20 @@ int max(List<int> input) => 42;
 ```
 
 We need to add another invariant to reject this function as well.
-Arguably the most obvious invariant for `max` is that the result should be greater than or equal to all items of the list:
+Arguably the most obvious invariant for `max` is the following: The maximum should be greater than or equal to all items of the list:
 
 ```dart
-Glados<List<int>>().test('maximum is >= all items', (list) {
+Glados(any.nonEmptyList(any.int)).test('maximum is >= all items', (list) {
   var maximum = max(list);
-  if (maximum != null) {
-    for (var item in list) {
-      expect(maximum, greaterThanOrEqualTo(item));
-    }
+  for (var item in list) {
+    expect(maximum, greaterThanOrEqualTo(item));
   }
 });
 ```
+
+Instead of defining type parameters, you can also pass in *arbitraries* to Glados to customize which values are generated.
+You can find all available arbitraries as fields on the `any` value.
+In this case, we only test with non-empty lists because we handled the empty list in the first test.
 
 Running the tests produces the following result:
 
@@ -127,11 +135,8 @@ This fixes the tests, but still doesn't work for lists containing only negative 
 So, let's add a final test:
 
 ```dart
-Glados<List<int>>().test('maximum is in the list', (list) {
-  var maximum = max(list);
-  if (maxmium != null) {
-    expect(list, contains(maximum));
-  }
+Glados(any.nonEmptyList(any.int)).test('maximum is in the list', (list) {
+  expect(list, contains(max(list)));
 });
 ```
 
@@ -143,9 +148,11 @@ Rather, they correspond to the **actual mathematical definition of max**.
 
 ## Strengths
 
-- ⚡ You have to write fewer tests.
-- 💪🏻 You increase confidence in your code.
-- 🤯 You develop a better understanding for the problem domain.
+- ⚡ **You have to write fewer tests.** Because your tests work with any input, you can let Glados take care of generating concrete inputs.
+- 🌌 **You test for all possible inputs.** Instead of thinking of a few examples, you test for a *lot* of inputs.
+- 💪🏻 **You get a minimal error inducing input.** That makes logic errors more obvious than when having to figure out why the code failed on a complex input.
+- 🤯 **You develop a better understanding for the problem domain** because you have to think of invariants.
+- 🎲 **The tests are reproducible.** Glados uses a pseudo-random generator that's always created with the same seed.
 
 ## How does it work?
 
@@ -154,7 +161,7 @@ Glados works in two phases:
 - **The exploration phase**: Glados generates increasingly complex, random inputs until one breaks the invariant or the maximum number of runs is reached.
 - **The shrinking phase**: This phase only happens if Glados found an input that breaks the invariant. In this case, the input is gradually simplified and the smallest input that's still breaking the invariant is returned.
 
-## Customizing Glados testing
+## Advanced Glados testing
 
 ### Multiple inputs
 
@@ -260,5 +267,6 @@ So I thought that's quite a fitting name. 🍰
 
 ## Further info & resources
 
+- Special thanks to [@batteredgherkin](https://github.com/batteredgherkin) for the Glados sticker at the top.
 - [Here's the talk](https://www.youtube.com/watch?v=IYzDFHx6QPY) that got me into property-based testing.
 - [This article](https://begriffs.com/posts/2017-01-14-design-use-quickcheck.html) covers the topic in more detail.

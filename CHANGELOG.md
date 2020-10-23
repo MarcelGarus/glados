@@ -1,15 +1,24 @@
+## 0.1.1
+
+- Improve readme. This includes adding a Glados sticker at the top.
+- Add arbitraries: `nonEmptyList`, `positiveInt`, `positiveIntOrZero`, `negativeInt`, `negativeIntOrZero`
+
+## 0.1.0
+
+- Add arbitraries: `lowercaseLetters`, `uppercaseLetters`, `letters`, `digits`
+
 ## 0.1.0
 
 - Redesign API: Syntax is now `Glados<...>().test(...)`. The `any` provides a namespace for all `Arbitrary`s.
 - Improve readme and describe customization options.
 - Improve console output.
-- Add several arbitraries for `lowercaseLetters`, `uppercaseLetters`, `letters`, `digits`.
+- Add arbitraries: `lowercaseLetters`, `uppercaseLetters`, `letters`, `digits`
 - Make errors more helpful by providing call to actions.
 
 ## 0.0.4
 
 - Improve readme.
-- Add several arbitraries for `Null`, `bool`, `int`, `double`, `num`, `BigInt`, `DateTime`, `Duration`, `Set`, `List`, `MapEntry`, `Map`.
+- Add arbitraries: `null`, `bool`, `int`, `double`, `num`, `bigInt`, `dateTime`, `duration`, `set`, `list`, `mapEntry`, `map`
 - Improve errors.
 
 ## 0.0.3
