@@ -1,3 +1,10 @@
+## 0.1.4
+
+- Add code generator.
+- Add arbitrary: `stringOf`
+- Flesh out example.
+- Fix analysis error.
+
 ## 0.1.3
 
 - Move sticker to the top.
@@ -15,14 +22,10 @@
 
 ## 0.1.0
 
-- Add arbitraries: `lowercaseLetters`, `uppercaseLetters`, `letters`, `digits`
-
-## 0.1.0
-
 - Redesign API: Syntax is now `Glados<...>().test(...)`. The `any` provides a namespace for all `Arbitrary`s.
 - Improve readme and describe customization options.
 - Improve console output.
-- Add arbitraries: `lowercaseLetters`, `uppercaseLetters`, `letters`, `digits`
+- Add arbitraries: `lowercaseLetter`, `uppercaseLetter`, `letter`, `digit`
 - Make errors more helpful by providing call to actions.
 
 ## 0.0.4
