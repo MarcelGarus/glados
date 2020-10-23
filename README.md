@@ -1,9 +1,6 @@
-Testing is tedious!
-At least that's what I thought before I stumbled over **property-based testing** – a simple approach that allows you to write fewer tests yet gain more confidence in your code.
-
-In traditional testing, you define concrete inputs and test whether they result in the desired output.
-In property based testing, you define certain conditions that are always true for any input (those are also called *invariants*).
-In mathematics, there's the ∀ operator for that. In Dart, now there's Glados.
+|                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |                                                                                   |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| <p>Testing is tedious! At least that's what I thought before I stumbled over **property-based testing** – a simple approach that allows you to write fewer tests yet gain more confidence in your code.</p><p>In traditional testing, you define concrete inputs and test whether they result in the desired output. In property based testing, you define certain conditions that are always true for any input (those are also called *invariants*). In mathematics, there's the ∀ operator for that. In Dart, now there's Glados.</p> | <img src="https://raw.githubusercontent.com/marcelgarus/glados/main/glados.webp"> |
 
 Here are some benefits:
 
@@ -255,12 +252,14 @@ By default, `Explore` uses a `Random` instance created with a fixed seed so that
 
 ## What's up with the name?
 
-|                                                                                                                                                                                                                                                                                                                                                                                |                                                                                   |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------- |
-| <p>GLaDOS is a very nice robot in the Portal game series. She's the head of the Aperture Science Laboratory facilities, where she spends the rest of her days testing. So I thought that's quite a fitting name. 🍰</p><p>By the way, both Portal games are great. If you haven't played them, definitely [check them out](https://store.steampowered.com/app/400/Portal/).</p> | <img src="https://raw.githubusercontent.com/marcelgarus/glados/main/glados.webp"> |
+GLaDOS is a very nice robot in the Portal game series. She's the head of the Aperture Science Laboratory facilities, where she spends the rest of her days testing. So I thought that's quite a fitting name. 🥔
+
+By the way, both Portal games are great. If you haven't played them, definitely [check them out](https://store.steampowered.com/app/400/Portal/).
 
 ## Further info & resources
 
 - Special thanks to [@batteredgherkin](https://github.com/batteredgherkin) for the Glados sticker.
 - [Here's the talk](https://www.youtube.com/watch?v=IYzDFHx6QPY) that got me into property-based testing.
 - [This article](https://begriffs.com/posts/2017-01-14-design-use-quickcheck.html) covers the topic in more detail.
+
+🍰
