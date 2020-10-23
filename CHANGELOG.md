@@ -1,3 +1,8 @@
+## 0.1.3
+
+- Move sticker to the top.
+- Minor readme improvements.
+
 ## 0.1.2
 
 - Improve readme.
