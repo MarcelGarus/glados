@@ -1,6 +1,7 @@
 ## 0.1.2
 
-- Fix sticker.
+- Improve readme.
+- Fix the sticker URL.
 
 ## 0.1.1
 

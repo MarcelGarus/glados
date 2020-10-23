@@ -3,7 +3,15 @@ At least that's what I thought before I stumbled over **property-based testing**
 
 In traditional testing, you define concrete inputs and test whether they result in the desired output.
 In property based testing, you define certain conditions that are always true for any input (those are also called *invariants*).
-In mathematics, there's the ∀ operator for that. In Dart, now there's `glados`.
+In mathematics, there's the ∀ operator for that. In Dart, now there's Glados.
+
+Here are some benefits:
+
+- ⚡ **You have to write fewer tests.** Remember the old days when you had to come up with concrete values? With Glados, just write a few invariants and let Glados take care of figuring out how to break them.
+- 🌌 **You test for all possible inputs.** Well, not literally all. But Glados takes care of testing your invariants with a huge variety of inputs. Feel more confident in your code!
+- 🐜 **You get a minimal error inducing input.** After Glados found an input that breaks your invariant, it doesn't just stop. Rather, it tries to simplify the input to give you the most condensed error report possible.
+- 🤯 **You develop a better understanding for the problem domain** because you have to think of invariants.
+- 🎲 **Don't worry: The tests are reproducible.** Glados uses a pseudo-random generator that's always created with the same seed. Running a test again tests your invariant with the same inputs as before.
 
 ```yml
 dev_dependencies:
@@ -15,7 +23,6 @@ dev_dependencies:
 <summary>Table of Contents</summary>
 
 - [Getting started](#getting-started)
-- [Strengths](#strengths)
 - [How does it work?](#how-does-it-work)
 - [Advanced Glados testing](#advanced-glados-testing)
   - [Multiple inputs](#multiple-inputs)
@@ -144,20 +151,12 @@ But whatever solution you come up with, it'll be correct:
 Our tests aren't merely some arbitrary examples anymore.
 Rather, they correspond to the **actual mathematical definition of max**.
 
-## Strengths
-
-- ⚡ **You have to write fewer tests.** Because your tests work with any input, you can let Glados take care of generating concrete inputs.
-- 🌌 **You test for all possible inputs.** Instead of thinking of a few examples, you test for a *lot* of inputs.
-- 💪🏻 **You get a minimal error inducing input.** That makes logic errors more obvious than when having to figure out why the code failed on a complex input.
-- 🤯 **You develop a better understanding for the problem domain** because you have to think of invariants.
-- 🎲 **The tests are reproducible.** Glados uses a pseudo-random generator that's always created with the same seed.
-
 ## How does it work?
 
 Glados works in two phases:
 
-- **The exploration phase**: Glados generates increasingly complex, random inputs until one breaks the invariant or the maximum number of runs is reached.
-- **The shrinking phase**: This phase only happens if Glados found an input that breaks the invariant. In this case, the input is gradually simplified and the smallest input that's still breaking the invariant is returned.
+- 🌍 **The exploration phase**: Glados generates increasingly complex, random inputs until one breaks the invariant or the maximum number of runs is reached.
+- 🐜 **The shrinking phase**: This phase only happens if Glados found an input that breaks the invariant. In this case, the input is gradually simplified and the smallest input that's still breaking the invariant is returned.
 
 ## Advanced Glados testing
 
@@ -174,17 +173,14 @@ Glados2<int, int>().test('complicated stuff', (a, b) {
 
 ### Arbitraries
 
-`Arbitrary`s are responsible for generating and shrinking values. They have two methods:
+Arbitraries are responsible for generating and shrinking values. The `Arbitrary` class has two methods:
 
 - `T generate(Random random, int size)` generates a new value of type `T`, using `random` as a source for randomness. The `size` argument is used as a rough estimate on how big or complex the returned value should be.  
-  For example, the `Arbitrary` for `int` produces `int`s in the range from `-size` to `size`.
+  For example, the arabitrary for `int` produces `int`s in the range from `-size` to `size`.
 - `Iterable<T> shrink(T input)` takes a value and returns an `Iterable` containing similar, but smaller values. Smaller means that calling `shrink` repeatedly on the smaller values and their children etc., the program should eventually terminate (aka the transitive hull with regard to `shrink` should be finite and acyclic).
 
 
-The basic types all have corresponding `Arbitrary`s implemented.
-
-Glados also accepts an optional `Arbitrary` that can be used to customize the input values.
-Also, there's `any`, which provides a namespace for `Arbitrary`s.
+The basic types all have corresponding arbitraries implemented. More arbitraries can be found on `any`.
 
 For example, if you want to test some code only with lowercase letters, you can write:
 
@@ -194,12 +190,12 @@ Glados(any.lowercaseLetters).test('text test', (text) { ... });
 
 ### Custom Arbitraries
 
-Sometimes it makes sense to create custom `Arbitrary`s.
+Sometimes it makes sense to create custom arbitraries.
 
 For example, if you test code that expects email addresses, it may be inefficient to test the code with random `String`s; if the tested code contains some sanity checks at the beginning, only a tiny fraction of values actually passes through the rest of the code.
 
-In that case, create a custom `Arbitrary`.
-To do that, add an extension on `Any`, which is a namespace for `Arbitrary`s:
+In that case, create a custom arbitrary.
+To do that, add an extension on `Any`, which is a namespace for arbitraries:
 
 ```dart
 extension EmailArbitrary on Any {
@@ -210,20 +206,20 @@ extension EmailArbitrary on Any {
 }
 ```
 
-Then, you can use that `Arbitrary` like this:
+Then, you can use that arbitrary like this:
 
 ```dart
 Glados(any.email).test('email test', (email) { ... });
 ```
 
-If you create an `Arbitrary` for a type that doesn't have an `Arbitrary` yet (or you want to swap out a built-in `Arbitrary` for some reason), you can set it as the default for that type:
+If you create an arbitrary for a type that doesn't have an arbitrary yet (or you want to swap out a built-in arbitrary for some reason), you can set it as the default for that type:
 
 ```dart
 // Use the email arbitrary for all Strings.
 Any.setDefault<String>(any.email);
 ```
 
-Then, you don't need to explicitly provide the `Arbitrary` to `Glados` anymore. Instead, `Glados` will use it based on given type parameters:
+Then, you don't need to explicitly provide the arbitrary to `Glados` anymore. Instead, `Glados` will use it based on given type parameters:
 
 ```dart
 // This will now use the any.email arbitrary, because it was set as the
@@ -259,16 +255,12 @@ By default, `Explore` uses a `Random` instance created with a fixed seed so that
 
 ## What's up with the name?
 
-GLaDOS is a very nice robot in the Portal game series.
-She's the head of the Aperture Science Laboratory facilities, where she spends the rest of her days testing.
-So I thought that's quite a fitting name. 🍰
+|                                                                                                                                                                                                                                                                                                                                                                      |                                                                                   |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| GLaDOS is a very nice robot in the Portal game series. She's the head of the Aperture Science Laboratory facilities, where she spends the rest of her days testing. So I thought that's quite a fitting name. 🍰<br>By the way, both Portal games are great. If you haven't played them, definitely [check them out](https://store.steampowered.com/app/400/Portal/). | <img src="https://raw.githubusercontent.com/marcelgarus/glados/main/glados.webp"> |
 
 ## Further info & resources
 
-- Special thanks to [@batteredgherkin](https://github.com/batteredgherkin) for the Glados sticker at the top.
+- Special thanks to [@batteredgherkin](https://github.com/batteredgherkin) for the Glados sticker.
 - [Here's the talk](https://www.youtube.com/watch?v=IYzDFHx6QPY) that got me into property-based testing.
 - [This article](https://begriffs.com/posts/2017-01-14-design-use-quickcheck.html) covers the topic in more detail.
-
-|                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |                                                                                                                      |
-| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| Testing is tedious!<br> At least that's what I thought before I stumbled over **property-based testing** – a simple approach that allows you to write fewer tests yet gain more confidence in your code.<br />In traditional testing, you define concrete inputs and test whether they result in the desired output.<br>In property based testing, you define certain conditions that are always true for any input (those are also called *invariants*).<br>In mathematics, there's the ∀ operator for that. In Dart, now there's `glados`. | <img style="float: right;width: 300px;" src="https://raw.githubusercontent.com/marcelgarus/glados/main/glados.webp"> |
