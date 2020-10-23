@@ -1,5 +1,3 @@
-<img style="float: right;width: 300px;" src="https://raw.githubusercontent.com/marcelgarus/glados/main/glados.webp">
-
 Testing is tedious!
 At least that's what I thought before I stumbled over **property-based testing** – a simple approach that allows you to write fewer tests yet gain more confidence in your code.
 
@@ -270,3 +268,7 @@ So I thought that's quite a fitting name. 🍰
 - Special thanks to [@batteredgherkin](https://github.com/batteredgherkin) for the Glados sticker at the top.
 - [Here's the talk](https://www.youtube.com/watch?v=IYzDFHx6QPY) that got me into property-based testing.
 - [This article](https://begriffs.com/posts/2017-01-14-design-use-quickcheck.html) covers the topic in more detail.
+
+|                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |                                                                                                                      |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| Testing is tedious!<br> At least that's what I thought before I stumbled over **property-based testing** – a simple approach that allows you to write fewer tests yet gain more confidence in your code.<br />In traditional testing, you define concrete inputs and test whether they result in the desired output.<br>In property based testing, you define certain conditions that are always true for any input (those are also called *invariants*).<br>In mathematics, there's the ∀ operator for that. In Dart, now there's `glados`. | <img style="float: right;width: 300px;" src="https://raw.githubusercontent.com/marcelgarus/glados/main/glados.webp"> |
