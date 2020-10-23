@@ -1,4 +1,4 @@
-<img style="float: right;width: 300px;" src="glados.webp">
+<img style="float: right;width: 300px;" src="https://raw.githubusercontent.com/marcelgarus/glados/main/glados.webp">
 
 Testing is tedious!
 At least that's what I thought before I stumbled over **property-based testing** – a simple approach that allows you to write fewer tests yet gain more confidence in your code.

@@ -1,3 +1,7 @@
+## 0.1.2
+
+- Fix sticker.
+
 ## 0.1.1
 
 - Improve readme. This includes adding a Glados sticker at the top.
