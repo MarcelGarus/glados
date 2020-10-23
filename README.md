@@ -23,8 +23,9 @@ dev_dependencies:
 - [How does it work?](#how-does-it-work)
 - [Advanced Glados testing](#advanced-glados-testing)
   - [Multiple inputs](#multiple-inputs)
-  - [Arbitraries](#arbitraries)
-  - [Custom Arbitraries](#custom-arbitraries)
+  - [Using custom arbitraries](#using-custom-arbitraries)
+  - [Generating custom arbitraries](#generating-custom-arbitraries)
+  - [Creating custom arbitraries manually](#creating-custom-arbitraries-manually)
   - [Explore](#explore)
 - [What's up with the name?](#whats-up-with-the-name)
 - [Further info & resources](#further-info--resources)
@@ -168,7 +169,7 @@ Glados2<int, int>().test('complicated stuff', (a, b) {
 })
 ```
 
-### Arbitraries
+### Using custom arbitraries
 
 Arbitraries are responsible for generating and shrinking values. The `Arbitrary` class has two methods:
 
@@ -185,9 +186,14 @@ For example, if you want to test some code only with lowercase letters, you can 
 Glados(any.lowercaseLetters).test('text test', (text) { ... });
 ```
 
-### Custom Arbitraries
+### Generating custom arbitraries
 
-Sometimes it makes sense to create custom arbitraries.
+You can let Glados generate arbitraries for your types by annotating them with `@GenerateArbitrary` and then running `pub run build_runner build`.
+This works for both data classes and enums.
+
+### Creating custom arbitraries manually
+
+Sometimes it makes sense to write new arbitraries.
 
 For example, if you test code that expects email addresses, it may be inefficient to test the code with random `String`s; if the tested code contains some sanity checks at the beginning, only a tiny fraction of values actually passes through the rest of the code.
 
@@ -195,10 +201,10 @@ In that case, create a custom arbitrary.
 To do that, add an extension on `Any`, which is a namespace for arbitraries:
 
 ```dart
-extension EmailArbitrary on Any {
-  Arbitrary<String> get email => arbitrary(
-    generate: (random, size) => /* code for generating emails */,
-    shrink: (input) => /* code for shrinking the given email */,
+extension EmailAdressArbitrary on Any {
+  Arbitrary<String> get emailAddress => arbitrary(
+    generate: (random, size) => /* code for generating email addresses */,
+    shrink: (emailAddress) => /* code for shrinking the given email address */,
   );
 }
 ```
@@ -206,28 +212,26 @@ extension EmailArbitrary on Any {
 Then, you can use that arbitrary like this:
 
 ```dart
-Glados(any.email).test('email test', (email) { ... });
+Glados(any.emailAddress).test('email test', (emailAddress) { ... });
 ```
 
 You can also set an arbitrary as the default arbitrary for a type:
 
 ```dart
 // Use the email arbitrary for all Strings.
-Any.setDefault<String>(any.email);
+Any.setDefault<String>(any.emailAddress);
 ```
 
 Then, you don't need to explicitly provide the arbitrary to `Glados` anymore. Instead, `Glados` will use it based on given type parameters:
 
 ```dart
-// This will now use the any.email arbitrary, because it was set as the
+// This will now use the any.emailAddress arbitrary, because it was set as the
 // default for String before.
 Glados<String>().test('blub', () { ... });
 ```
 
 <!--
-TODO:
-- code generation for arbitraries
-- package ecosystem arbitrary support
+TODO: package ecosystem arbitrary support
 -->
 
 ### Explore
