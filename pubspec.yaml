@@ -8,5 +8,7 @@ environment:
   sdk: ">=2.6.0 <3.0.0"
 
 dependencies:
+  build: any
+  source_gen: any
   test: ^1.0.0
   meta: ^1.0.0
