@@ -1,0 +1,6 @@
+name: example
+
+dependencies:
+  build_runner: any
+  glados:
+    path: ..
