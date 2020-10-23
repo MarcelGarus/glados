@@ -7,7 +7,7 @@ In mathematics, there's the ∀ operator for that. In Dart, now there's Glados.
 
 Here are some benefits:
 
-- ⚡ **You have to write fewer tests.** Remember the old days when you had to come up with concrete values? With Glados, just write a few invariants and let Glados take care of figuring out how to break them.
+- ⚡ **You have to write fewer tests.** Remember the old days when you had to come up with concrete values? With Glados, just write a few invariants and let Glados take care of figuring out the inputs that break them.
 - 🌌 **You test for all possible inputs.** Well, not literally all. But Glados takes care of testing your invariants with a huge variety of inputs. Feel more confident in your code!
 - 🐜 **You get a minimal error inducing input.** After Glados found an input that breaks your invariant, it doesn't just stop. Rather, it tries to simplify the input to give you the most condensed error report possible.
 - 🤯 **You develop a better understanding for the problem domain** because you have to think of invariants.
@@ -212,7 +212,7 @@ Then, you can use that arbitrary like this:
 Glados(any.email).test('email test', (email) { ... });
 ```
 
-If you create an arbitrary for a type that doesn't have an arbitrary yet (or you want to swap out a built-in arbitrary for some reason), you can set it as the default for that type:
+You can also set an arbitrary as the default arbitrary for a type:
 
 ```dart
 // Use the email arbitrary for all Strings.
@@ -255,9 +255,9 @@ By default, `Explore` uses a `Random` instance created with a fixed seed so that
 
 ## What's up with the name?
 
-|                                                                                                                                                                                                                                                                                                                                                                      |                                                                                   |
-| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| GLaDOS is a very nice robot in the Portal game series. She's the head of the Aperture Science Laboratory facilities, where she spends the rest of her days testing. So I thought that's quite a fitting name. 🍰<br>By the way, both Portal games are great. If you haven't played them, definitely [check them out](https://store.steampowered.com/app/400/Portal/). | <img src="https://raw.githubusercontent.com/marcelgarus/glados/main/glados.webp"> |
+|                                                                                                                                                                                                                                                                                                                                                                                |                                                                                   |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------- |
+| <p>GLaDOS is a very nice robot in the Portal game series. She's the head of the Aperture Science Laboratory facilities, where she spends the rest of her days testing. So I thought that's quite a fitting name. 🍰</p><p>By the way, both Portal games are great. If you haven't played them, definitely [check them out](https://store.steampowered.com/app/400/Portal/).</p> | <img src="https://raw.githubusercontent.com/marcelgarus/glados/main/glados.webp"> |
 
 ## Further info & resources
 
