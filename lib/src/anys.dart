@@ -199,7 +199,7 @@ extension PredefinedAnys on Any {
           }
         },
       );
-  Arbitrary<core.String> _randomString(core.String chars) => arbitrary(
+  Arbitrary<core.String> stringOf(core.String chars) => arbitrary(
         generate: (random, size) {
           final length = random.nextInt(size);
           final reducedChars = chars.substring(0, max(size, chars.length));
@@ -223,10 +223,10 @@ extension PredefinedAnys on Any {
         },
       );
   Arbitrary<core.String> get lowercaseLetter =>
-      _randomString('abcdefghijklmnopqrstuvwxyz');
+      stringOf('abcdefghijklmnopqrstuvwxyz');
   Arbitrary<core.String> get uppercaseLetter =>
-      _randomString('ABCDEFGHIJKLMNOPQRSTUVWXYZ');
+      stringOf('ABCDEFGHIJKLMNOPQRSTUVWXYZ');
   Arbitrary<core.String> get letter =>
-      _randomString('aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwWxXyYzZ');
-  Arbitrary<core.String> get digit => _randomString('0123456789');
+      stringOf('aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwWxXyYzZ');
+  Arbitrary<core.String> get digit => stringOf('0123456789');
 }
