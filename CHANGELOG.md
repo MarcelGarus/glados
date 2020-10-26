@@ -1,3 +1,9 @@
+## 0.1.6
+
+- Add quickstart section to readme.
+- Fix errors in readme.
+- Remove several unused files.
+
 ## 0.1.5
 
 - Improve readme.

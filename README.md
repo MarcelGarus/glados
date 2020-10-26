@@ -4,21 +4,16 @@
 
 Here are some benefits:
 
-- ⚡ **Write fewer tests.** Just write a few invariants and let Glados take care of figuring out inputs that break them.
-- 🌌 **Test for all possible inputs.** Well, not literally all. But Glados tests with a huge variety of inputs. Feel more confident in your code!
-- 🐜 **Get a minimal error inducing input.** Glados simplifies breaking inputs and provides a concise error report.
-- 🤯 **Understand for the problem domain better.** Thinking of invariants makes you more familiar with the domain.
-
-```yml
-dev_dependencies:
-  test: ...
-  glados: ...
-```
+- ⚡ **Write fewer tests.** Let Glados figure out inputs that break your invariants.
+- 🌌 **Test for all possible inputs.** Well, not literally all. But a huge variety.
+- 🐜 **Get a concise error report.** Glados simplifies inputs that break your tests.
+- 🤯 **Understand the problem domain better** by thinking of invariants.
 
 <details>
 <summary>Table of Contents</summary>
 
-- [Getting started](#getting-started)
+- [Quickstart](#quickstart)
+- [Comprehensive example](#comprehensive-example)
 - [How does it work?](#how-does-it-work)
 - [Multiple inputs](#multiple-inputs)
 - [Using arbitraries explicitly](#using-arbitraries-explicitly)
@@ -30,7 +25,48 @@ dev_dependencies:
 
 </details>
 
-## Getting started
+## Quickstart
+
+```yml
+dev_dependencies:
+  test: ...
+  glados: ...
+```
+
+Use `Glados<...>().test(...)` instead of the traditional `test(...)`.
+
+```dart
+// Running this test shows you that it fails for the input 21.
+Glados<int>().test((a) {
+  expect(a * 2, lessThan(42));
+});
+```
+
+You can test with multiple inputs.
+
+```dart
+Glados2<String, int>().test((a, b) { ... });
+```
+
+Instead of using type parameters, you can customize inputs using `any`.
+
+```dart
+Glados(any.lowercaseLetter).test((letter) { ... });
+Glados(any.nonEmptyList(any.positiveIntOrZero)).test((list) { ... });
+```
+
+You want to test with your own data classes? Use the `@GenerateArbitrary()` annotation!
+If that doesn't work, see [this section](#writing-arbitraries-manually).
+
+```dart
+@GenerateArbitrary()
+class MyClass { ... } // enums also work
+Glados(any.myClass).test((a) { ... });
+```
+
+You can also [customize the size of the generated inputs](#customizing-the-exploration-phase).
+
+## Comprehensive example
 
 Suppose you write a function that tries to find the maximum in a list.
 I know – that's pretty basic – but it's enough to get you started.
