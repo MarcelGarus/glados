@@ -4,7 +4,6 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:build/src/builder/build_step.dart';
 import 'package:build/build.dart';
 import 'package:glados/src/annotations.dart';
-import 'package:meta/meta.dart';
 import 'package:source_gen/source_gen.dart';
 
 /// Builds generators for `build_runner` to run.
@@ -88,11 +87,13 @@ class ArbitraryGenerator extends Generator {
               'for (final ${parameter.name} in '
                   '${parameter.name}Arbitrary.shrink($getterName.${parameter.name})) {',
               '  yield $name(',
-              for (final p in parameters)
+              for (final p in parameters) ...[
+                if (p.isNamed) '${p.name}: ',
                 if (p == parameter)
                   '${parameter.name},'
                 else
-                  '$getterName.${parameter.name},',
+                  '$getterName.${p.name},',
+              ],
               '  );',
               '}',
             ],
@@ -112,7 +113,6 @@ class ArbitraryGenerator extends Generator {
 extension on Element {
   bool get wantsArbitrary => TypeChecker.fromRuntime(GenerateArbitrary)
       .hasAnnotationOf(this, throwOnUnresolved: false);
-  bool get hasGenerics => false;
 }
 
 extension on String {

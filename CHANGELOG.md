@@ -1,3 +1,9 @@
+## 0.1.5
+
+- Improve readme.
+- Fix code generator for classes.
+- Fix analysis errors.
+
 ## 0.1.4
 
 - Add code generator.

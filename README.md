@@ -4,11 +4,10 @@
 
 Here are some benefits:
 
-- ⚡ **You have to write fewer tests.** Remember the old days when you had to come up with concrete values? With Glados, just write a few invariants and let Glados take care of figuring out the inputs that break them.
-- 🌌 **You test for all possible inputs.** Well, not literally all. But Glados takes care of testing your invariants with a huge variety of inputs. Feel more confident in your code!
-- 🐜 **You get a minimal error inducing input.** After Glados found an input that breaks your invariant, it doesn't just stop. Rather, it tries to simplify the input to give you the most condensed error report possible.
-- 🤯 **You develop a better understanding for the problem domain** because you have to think of invariants.
-- 🎲 **Don't worry: The tests are reproducible.** Glados uses a pseudo-random generator that's always created with the same seed. Running a test again tests your invariant with the same inputs as before.
+- ⚡ **Write fewer tests.** Just write a few invariants and let Glados take care of figuring out inputs that break them.
+- 🌌 **Test for all possible inputs.** Well, not literally all. But Glados tests with a huge variety of inputs. Feel more confident in your code!
+- 🐜 **Get a minimal error inducing input.** Glados simplifies breaking inputs and provides a concise error report.
+- 🤯 **Understand for the problem domain better.** Thinking of invariants makes you more familiar with the domain.
 
 ```yml
 dev_dependencies:
@@ -21,12 +20,11 @@ dev_dependencies:
 
 - [Getting started](#getting-started)
 - [How does it work?](#how-does-it-work)
-- [Advanced Glados testing](#advanced-glados-testing)
-  - [Multiple inputs](#multiple-inputs)
-  - [Using custom arbitraries](#using-custom-arbitraries)
-  - [Generating custom arbitraries](#generating-custom-arbitraries)
-  - [Creating custom arbitraries manually](#creating-custom-arbitraries-manually)
-  - [Explore](#explore)
+- [Multiple inputs](#multiple-inputs)
+- [Using arbitraries explicitly](#using-arbitraries-explicitly)
+- [Generating arbitraries](#generating-arbitraries)
+- [Writing arbitraries manually](#writing-arbitraries-manually)
+- [Customizing the exploration phase](#customizing-the-exploration-phase)
 - [What's up with the name?](#whats-up-with-the-name)
 - [Further info & resources](#further-info--resources)
 
@@ -156,9 +154,7 @@ Glados works in two phases:
 - 🌍 **The exploration phase**: Glados generates increasingly complex, random inputs until one breaks the invariant or the maximum number of runs is reached.
 - 🐜 **The shrinking phase**: This phase only happens if Glados found an input that breaks the invariant. In this case, the input is gradually simplified and the smallest input that's still breaking the invariant is returned.
 
-## Advanced Glados testing
-
-### Multiple inputs
+## Multiple inputs
 
 You can use `Glados2` and `Glados3` for Glados tests with multiple inputs.
 If you need support for more inputs, don't hestitate to [open an issue](https://github.com/marcelgarus/glados/issues/new).
@@ -169,7 +165,7 @@ Glados2<int, int>().test('complicated stuff', (a, b) {
 })
 ```
 
-### Using custom arbitraries
+## Using arbitraries explicitly
 
 Arbitraries are responsible for generating and shrinking values. The `Arbitrary` class has two methods:
 
@@ -186,12 +182,12 @@ For example, if you want to test some code only with lowercase letters, you can 
 Glados(any.lowercaseLetters).test('text test', (text) { ... });
 ```
 
-### Generating custom arbitraries
+## Generating arbitraries
 
 You can let Glados generate arbitraries for your types by annotating them with `@GenerateArbitrary` and then running `pub run build_runner build`.
 This works for both data classes and enums.
 
-### Creating custom arbitraries manually
+## Writing arbitraries manually
 
 Sometimes it makes sense to write new arbitraries.
 
@@ -234,7 +230,7 @@ Glados<String>().test('blub', () { ... });
 TODO: package ecosystem arbitrary support
 -->
 
-### Explore
+## Customizing the exploration phase
 
 You can also customize the exploration phase.
 To do that, you can use `Explore`, which is a configuration for certain values used during that phase.
