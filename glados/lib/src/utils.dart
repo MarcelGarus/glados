@@ -18,6 +18,10 @@ class Statistics {
 
 extension ChoosingRandomly on Random {
   T choose<T>(List<T> list) => list[nextInt(nextInt(list.length))];
+  int nextIntInRange(int min, int max) {
+    assert(min == null || max == null || min <= max);
+    return nextInt(max - min) + min;
+  }
 }
 
 /// Runs the [tester] with the [input]. Catches thrown errors and instead
@@ -32,8 +36,8 @@ bool succeeds<T>(Tester<T> tester, T input) {
 }
 
 /// Indicates that no arbitrary was found for a type.
-class NoArbitraryFound implements Exception {
-  NoArbitraryFound(this.type);
+class NoGeneratorFound implements Exception {
+  NoGeneratorFound(this.type);
 
   final Type type;
 

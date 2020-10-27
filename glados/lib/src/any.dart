@@ -3,74 +3,350 @@ import 'dart:math';
 import 'package:meta/meta.dart';
 
 import 'anys.dart';
+import 'generator.dart';
 import 'utils.dart';
 
-/// An [Arbitrary] makes it possible to use [Glados] to test type [T].
-abstract class Arbitrary<T> {
-  /// Generates a new value of type [T], using [size] as a rough complexity
-  /// estimate. The [random] instance should be used for all pseudo-random
-  /// values.
-  T generate(Random random, int size);
-
-  /// Given an [input], generates an [Iterable] of inputs that fulfill the
-  /// following criteria:
-  ///
-  /// - They are _similar_ to the given [input]: They only differ in little
-  ///   ways.
-  /// - They are _simpler_ than the given [input]: The transitive hull is finite
-  ///   and acyclic: If you would call [shrink] on all returned inputs and on
-  ///   the inputs returned by them etc., this process should terminate
-  ///   sometime.
-  Iterable<T> shrink(T input);
-}
-
-/// A version of [Arbitrary] where you can pass both methods as parameters,
-/// making it very simple to define custom anonymous implementations without
-/// creating new classes.
-class _InlineArbitrary<T> extends Arbitrary<T> {
-  _InlineArbitrary(this._generate, this._shrink);
-
-  final T Function(Random random, int size) _generate;
-  final Iterable<T> Function(T input) _shrink;
-
-  T generate(Random random, int size) => _generate(random, size);
-  Iterable<T> shrink(T input) => _shrink(input);
-}
-
-/// A namespace for all [Arbitrary]s.
+/// The [any] singleton, providing a namespace for [Generator]s.
 ///
-/// New [Arbitrary]s should be added as extension methods, so you can use them
+/// New [Generator]s should be added as extension methods, so you can use them
 /// with a syntax like this: `any.int`
-/// Also, you can register an [Arbitrary] as the default [Arbitrary] for a given
-/// type. Then, you don't need to pass the concrete [Arbitrary] to [Glados]
-/// anymore – [Glados] can infer the right [Arbitrary] for the type annotation.
-class Any {
-  /// A map from [Type]s to their default [Arbitrary].
-  static final _defaults = <_TypeWrapper<dynamic>, Arbitrary<dynamic>>{
-    ..._defaultArbitraries
-  };
-  static void setDefault<T>(Arbitrary<T> arbitrary) =>
-      _defaults[_TypeWrapper<T>()] = arbitrary;
-  static Arbitrary<T> defaultFor<T>() =>
-      _defaults[_TypeWrapper<T>()] ?? (throw NoArbitraryFound(T));
-
-  /// Creates a new arbitrary with the given functions.
-  Arbitrary<T> arbitrary<T>({
-    @required T Function(Random random, int size) generate,
-    @required Iterable<T> Function(T input) shrink,
-  }) =>
-      _InlineArbitrary(generate, shrink);
-}
-
-/// The [any] singleton, providing a namespace for [Arbitrary]s.
 final any = Any();
+
+/// A namespace for all [Generator]s.
+///
+/// You can register an [Generator] as the default [Generator] for a given
+/// type. Then, you don't need to pass the concrete [Generator] to [Glados]
+/// anymore – [Glados] can infer the right [Generator] only given the generic
+/// types.
+class Any {
+  /// A map from [Type]s to their default [Generator].
+  static final _defaults = <_TypeWrapper<dynamic>, Generator<dynamic>>{
+    ..._defaultGenerators
+  };
+  static void setDefault<T>(Generator<T> generator) =>
+      _defaults[_TypeWrapper<T>()] = generator;
+  static Generator<T> defaultFor<T>() =>
+      _defaults[_TypeWrapper<T>()] ?? (throw NoGeneratorFound(T));
+}
 
 class _TypeWrapper<T> {
   operator ==(Object other) => other.runtimeType == runtimeType;
   int get hashCode => runtimeType.hashCode;
 }
 
-final _defaultArbitraries = {
+/// Useful utilities for creating [Geneator]s that behave just like you want to.
+extension AnyUtils on Any {
+  /// Creates a new, simple [Generator] that produces values and knows how to
+  /// simplify them.
+  Generator<T> simple<T>({
+    @required T Function(Random random, int size) generate,
+    @required Iterable<T> Function(T input) shrink,
+  }) {
+    // Map both given functions to the semantics of generators: Instead of
+    // having two top-level functions, we have one function that generates
+    // `ShrinkableValue`s that each know how the shrink themselves.
+
+    Shrinkable<T> Function(T input) generateShrinkable;
+    generateShrinkable = (T value) {
+      return Shrinkable(value, () sync* {
+        for (final value in shrink(value)) {
+          yield generateShrinkable(value);
+        }
+      });
+    };
+    return (random, size) {
+      return generateShrinkable(generate(random, size));
+    };
+  }
+
+  /// Returns always the same value.
+  Generator<T> always<T>(T value) =>
+      simple(generate: (_, __) => value, shrink: (_) => []);
+
+  /// Chooses between the given values. Values further at the front of the
+  /// list are considered less complex.
+  Generator<T> choose<T>(List<T> values) {
+    assert(values.toSet().length == values.length,
+        'The list of values given to any.choice contains duplicate items.');
+    return simple(
+      generate: (random, size) => values[random.nextInt(
+        size.clamp(0, values.length - 1),
+      )],
+      shrink: (option) sync* {
+        final index = values.indexOf(option);
+        if (index > 0) yield values[index - 1];
+      },
+    );
+  }
+
+  /// Uses either the first or the second generator to generate a value.
+  Generator<T> either<T>(Generator<T> first, Generator<T> second) {
+    return (random, size) {
+      final chosenGenerator = choose([first, second])(random, size).value;
+      return chosenGenerator(random, size);
+    };
+  }
+
+  // Generator<T> chooseWithFrequency<T>(Map<T, double> options) {
+  //   return arbitrary(
+  //     generate: (random, size) =>
+  //   );
+  // }
+}
+
+extension CombinableAny on Any {
+  /// Combines n values. Is not typesafe, so it's private.
+  Generator<T> _combineN<T>(
+    List<Generator<dynamic>> generators,
+    T Function(List<dynamic> values) combiner,
+  ) {
+    return (random, size) {
+      return ShrinkableCombination(<Shrinkable<T>>[
+        for (final generator in generators) generator(random, size),
+      ], combiner);
+    };
+  }
+
+  /// Combines 2 values.
+  Generator<T> combine2<A, B, T>(
+    Generator<A> aGenerator,
+    Generator<B> bGenerator,
+    T Function(A a, B b) combiner,
+  ) {
+    return _combineN(
+      [aGenerator, bGenerator],
+      (values) => combiner(values[0] as A, values[1] as B),
+    );
+  }
+
+  /// Combines 3 values.
+  Generator<T> combine3<A, B, C, T>(
+    Generator<A> aGenerator,
+    Generator<B> bGenerator,
+    Generator<C> cGenerator,
+    T Function(A a, B b, C c) combiner,
+  ) {
+    return _combineN(
+      [aGenerator, bGenerator, cGenerator],
+      (values) => combiner(values[0] as A, values[1] as B, values[2] as C),
+    );
+  }
+
+  /// Combines 4 values.
+  Generator<T> combine4<A, B, C, D, T>(
+    Generator<A> aGenerator,
+    Generator<B> bGenerator,
+    Generator<C> cGenerator,
+    Generator<D> dGenerator,
+    T Function(A a, B b, C c, D d) combiner,
+  ) {
+    return _combineN(
+      [aGenerator, bGenerator, cGenerator, dGenerator],
+      (values) => combiner(
+        values[0] as A,
+        values[1] as B,
+        values[2] as C,
+        values[3] as D,
+      ),
+    );
+  }
+
+  /// Combines 5 values.
+  Generator<T> combine5<T0, T1, T2, T3, T4, T>(
+    Generator<T0> generator0,
+    Generator<T1> generator1,
+    Generator<T2> generator2,
+    Generator<T3> generator3,
+    Generator<T4> generator4,
+    T Function(T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4) combiner,
+  ) {
+    return _combineN(
+      [generator0, generator1, generator2, generator3, generator4],
+      (values) => combiner(
+        values[0] as T0,
+        values[1] as T1,
+        values[2] as T2,
+        values[3] as T3,
+        values[4] as T4,
+      ),
+    );
+  }
+
+  /// Combines 6 values.
+  Generator<T> combine6<T0, T1, T2, T3, T4, T5, T>(
+    Generator<T0> generator0,
+    Generator<T1> generator1,
+    Generator<T2> generator2,
+    Generator<T3> generator3,
+    Generator<T4> generator4,
+    Generator<T5> generator5,
+    T Function(T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5) combiner,
+  ) {
+    return _combineN(
+      [generator0, generator1, generator2, generator3, generator4, generator5],
+      (values) => combiner(
+        values[0] as T0,
+        values[1] as T1,
+        values[2] as T2,
+        values[3] as T3,
+        values[4] as T4,
+        values[5] as T5,
+      ),
+    );
+  }
+
+  // Combines 7 values.
+  Generator<T> combine7<T0, T1, T2, T3, T4, T5, T6, T>(
+    Generator<T0> generator0,
+    Generator<T1> generator1,
+    Generator<T2> generator2,
+    Generator<T3> generator3,
+    Generator<T4> generator4,
+    Generator<T5> generator5,
+    Generator<T6> generator6,
+    T Function(T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
+        combiner,
+  ) {
+    return _combineN(
+      [
+        generator0, generator1, generator2, generator3, generator4, generator5,
+        generator6 //
+      ],
+      (values) => combiner(
+        values[0] as T0,
+        values[1] as T1,
+        values[2] as T2,
+        values[3] as T3,
+        values[4] as T4,
+        values[5] as T5,
+        values[6] as T6,
+      ),
+    );
+  }
+
+  // Combines 8 values.
+  Generator<T> combine8<T0, T1, T2, T3, T4, T5, T6, T7, T>(
+    Generator<T0> generator0,
+    Generator<T1> generator1,
+    Generator<T2> generator2,
+    Generator<T3> generator3,
+    Generator<T4> generator4,
+    Generator<T5> generator5,
+    Generator<T6> generator6,
+    Generator<T7> generator7,
+    T Function(T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6,
+            T7 arg7)
+        combiner,
+  ) {
+    return _combineN(
+      [
+        generator0, generator1, generator2, generator3, generator4, generator5,
+        generator6, generator7 //
+      ],
+      (values) => combiner(
+        values[0] as T0,
+        values[1] as T1,
+        values[2] as T2,
+        values[3] as T3,
+        values[4] as T4,
+        values[5] as T5,
+        values[6] as T6,
+        values[7] as T7,
+      ),
+    );
+  }
+
+  // Combines 9 values.
+  Generator<T> combine9<T0, T1, T2, T3, T4, T5, T6, T7, T8, T>(
+    Generator<T0> generator0,
+    Generator<T1> generator1,
+    Generator<T2> generator2,
+    Generator<T3> generator3,
+    Generator<T4> generator4,
+    Generator<T5> generator5,
+    Generator<T6> generator6,
+    Generator<T7> generator7,
+    Generator<T8> generator8,
+    T Function(T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6,
+            T7 arg7, T8 arg8)
+        combiner,
+  ) {
+    return _combineN(
+      [
+        generator0, generator1, generator2, generator3, generator4, generator5,
+        generator6, generator7, generator8 //
+      ],
+      (values) => combiner(
+        values[0] as T0,
+        values[1] as T1,
+        values[2] as T2,
+        values[3] as T3,
+        values[4] as T4,
+        values[5] as T5,
+        values[6] as T6,
+        values[7] as T7,
+        values[8] as T8,
+      ),
+    );
+  }
+
+  // Combines 10 values.
+  Generator<T> combine10<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T>(
+    Generator<T0> generator0,
+    Generator<T1> generator1,
+    Generator<T2> generator2,
+    Generator<T3> generator3,
+    Generator<T4> generator4,
+    Generator<T5> generator5,
+    Generator<T6> generator6,
+    Generator<T7> generator7,
+    Generator<T8> generator8,
+    Generator<T9> generator9,
+    T Function(T0 arg0, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6,
+            T7 arg7, T8 arg8, T9 arg9)
+        combiner,
+  ) {
+    return _combineN(
+      [
+        generator0, generator1, generator2, generator3, generator4, generator5,
+        generator6, generator7, generator8, generator9 //
+      ],
+      (values) => combiner(
+        values[0] as T0,
+        values[1] as T1,
+        values[2] as T2,
+        values[3] as T3,
+        values[4] as T4,
+        values[5] as T5,
+        values[6] as T6,
+        values[7] as T7,
+        values[8] as T8,
+        values[9] as T9,
+      ),
+    );
+  }
+}
+
+class ShrinkableCombination<T> implements Shrinkable<T> {
+  ShrinkableCombination(this.fields, this.combiner);
+
+  final List<Shrinkable<T>> fields;
+  final T Function(List<dynamic> values) combiner;
+
+  @override
+  get value => combiner(fields);
+
+  @override
+  Iterable<Shrinkable<T>> shrink() sync* {
+    for (var i = 0; i < fields.length; i++) {
+      for (final shrunk in fields[i].shrink()) {
+        yield ShrinkableCombination(List.of(fields)..[i] = shrunk, combiner);
+      }
+    }
+  }
+}
+
+final _defaultGenerators = {
   _TypeWrapper<Null>(): any.null_,
   _TypeWrapper<bool>(): any.bool,
   _TypeWrapper<int>(): any.int,

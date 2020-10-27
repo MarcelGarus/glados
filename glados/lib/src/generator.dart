@@ -1,124 +1,76 @@
-import 'package:analyzer/dart/element/element.dart';
-// That's just the way the import system works for now.
-// ignore: implementation_imports
-import 'package:build/src/builder/build_step.dart';
-import 'package:build/build.dart';
-import 'package:glados/src/annotations.dart';
-import 'package:source_gen/source_gen.dart';
+import 'dart:math';
 
-/// Builds generators for `build_runner` to run.
-Builder getArbitraryBuilder(BuilderOptions options) {
-  return SharedPartBuilder([ArbitraryGenerator()], 'glados');
+/// An [Generator] makes it possible to use [Glados] to test type [T].
+/// Generates a new [ShrinkableValue] of type [T], using [size] as a rough
+/// complexity estimate. The [random] instance should be used as a source for
+/// all pseudo-randomness.
+typedef Generator<T> = ShrinkableValue<T> Function(Random random, int size);
+
+/// A wrapper for a value that knows how to shrink itself.
+abstract class ShrinkableValue<T> {
+  factory ShrinkableValue(
+          T value, Iterable<ShrinkableValue<T>> Function() shrink) =
+      _InlineShrinkableValue<T>;
+
+  /// The actual value itself.
+  T get value;
+
+  /// Generates an [Iterable] of [ShrinkableValue]s that fulfill the following
+  /// criteria:
+  ///
+  /// - They are _similar_ to this: They only differ in little ways.
+  /// - They are _simpler_ than this: The transitive hull is finite acyclic. If
+  ///   you would call [shrink] on all returned values and on the values
+  ///   returned by them etc., this process should terminate sometime.
+  Iterable<ShrinkableValue<T>> shrink();
 }
 
-class ArbitraryGenerator extends Generator {
+/// An inline versions for the [ShrinkableValue].
+class _InlineShrinkableValue<T> implements ShrinkableValue<T> {
+  _InlineShrinkableValue(this.value, this._shrinker);
+
   @override
-  Future<String> generate(LibraryReader library, BuildStep buildStep) async {
-    final code = StringBuffer();
-    final annotatedClasses = library.allElements
-        .whereType<ClassElement>()
-        .where((class_) => class_.wantsArbitrary);
+  final T value;
+  final Iterable<ShrinkableValue<T>> Function() _shrinker;
 
-    for (final class_ in annotatedClasses) {
-      final name = class_.name;
-      final getterName = name.toLowerCamelCase();
-      code.writeln('extension Arbitrary$name on Any {');
+  @override
+  Iterable<ShrinkableValue<T>> shrink() => _shrinker();
+}
 
-      if (class_.isEnum) {
-        code
-          ..writeln('Arbitrary<$name> get $getterName => arbitrary(')
-          ..writeln('  generate: (random, size) {')
-          ..writeln('    return $name.values[random.nextInt(')
-          ..writeln('      size.clamp(0, $name.values.length - 1),')
-          ..writeln('    )];')
-          ..writeln('  },')
-          ..writeln('  shrink: ($getterName) sync* {')
-          ..writeln('    if ($getterName.index > 0) {')
-          ..writeln('      yield $name.values[$getterName.index - 1];')
-          ..writeln('    }')
-          ..writeln('  },')
-          ..writeln(');');
-      } else {
-        // TODO: assert: has only initializing formals and no extra fields.
-        final constructor = class_.unnamedConstructor;
-        if (constructor == null) {
-          throw Exception("$name isn't annotated with @GenerateArbitrary, but "
-              "doesn't have an unnamed constructor. If you don't want to "
-              'provide an unnamed constructor, you need to create an arbitray '
-              'manually.');
-        }
-        final parameters = constructor.parameters;
-        for (final parameter in parameters) {
-          if (!parameter.isInitializingFormal) {
-            throw Exception("$name's unnamed constructor has the parameter "
-                '"${parameter.name}", which doesn\'t use the '
-                '"this.${parameter.name}" syntax. '
-                "You'll need to create an arbitrary manually.");
-          }
-        }
-        for (final field in class_.fields) {
-          if (parameters.every((parameter) => parameter.name != field.name)) {
-            throw Exception("Field ${field.name} isn't initialized in the "
-                'unnamed constructor using the "this.${field.name}" syntax. '
-                "You'll need to create an arbitrary manually.");
-          }
-        }
-        code
-          ..writeln('Arbitrary<${class_.name}> $getterName(')
-          ..writeln([
-            for (final parameter in parameters)
-              'Arbitrary<${parameter.type.getDisplayString(withNullability: false)}> '
-                  '${parameter.name}Arbitrary,'
-          ].joinLines())
-          ..writeln(') => arbitrary(')
-          ..writeln('  generate: (random, size) {')
-          ..writeln('    return $name(')
-          ..writeln([
-            for (final parameter in parameters) ...[
-              if (parameter.isNamed) '${parameter.name}: ',
-              '${parameter.name}Arbitrary.generate(random, size),'
-            ],
-          ].joinLines())
-          ..writeln('    );')
-          ..writeln('  },')
-          ..writeln('  shrink: ($getterName) sync* {')
-          ..writeln([
-            for (final parameter in parameters) ...[
-              'for (final ${parameter.name} in '
-                  '${parameter.name}Arbitrary.shrink($getterName.${parameter.name})) {',
-              '  yield $name(',
-              for (final p in parameters) ...[
-                if (p.isNamed) '${p.name}: ',
-                if (p == parameter)
-                  '${parameter.name},'
-                else
-                  '$getterName.${p.name},',
-              ],
-              '  );',
-              '}',
-            ],
-          ].joinLines())
-          ..writeln('  ')
-          ..writeln('  },')
-          ..writeln(');');
-      }
+/// Useful methods on [Generator]s.
+extension GeneratorUtils<T> on Generator<T> {
+  /// Returns [null] in 10 % of cases.
+  // Generator<T> get orNull => any.arbitrary(
+  //       generate: (random, size) =>
+  //           random.nextDouble() < 0.1 ? null : this.generate(random, size),
+  //       shrink: (value) sync* {
+  //         if (value != null) {
+  //           yield* this.shrink(value);
+  //         }
+  //       },
+  //     );
 
-      code.writeln('}\n');
-    }
-
-    return code.toString();
+  Generator<R> map<R>(R Function(T value) mapper) {
+    return (random, size) {
+      final value = this(random, size);
+      return MappedShrinkableValue<T, R>(value, mapper);
+    };
   }
 }
 
-extension on Element {
-  bool get wantsArbitrary => TypeChecker.fromRuntime(GenerateArbitrary)
-      .hasAnnotationOf(this, throwOnUnresolved: false);
-}
+class MappedShrinkableValue<T, R> implements ShrinkableValue<R> {
+  MappedShrinkableValue(this.originalValue, this.mapper);
 
-extension on String {
-  String toLowerCamelCase() => this[0].toLowerCase() + substring(1);
-}
+  final ShrinkableValue<T> originalValue;
+  final R Function(T value) mapper;
 
-extension on List<String> {
-  String joinLines() => join('\n');
+  @override
+  R get value => mapper(originalValue.value);
+
+  @override
+  Iterable<ShrinkableValue<R>> shrink() {
+    return originalValue.shrink().map((value) {
+      return MappedShrinkableValue(value, mapper);
+    });
+  }
 }
