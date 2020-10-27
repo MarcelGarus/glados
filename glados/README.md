@@ -15,10 +15,6 @@ Here are some benefits:
 - [Quickstart](#quickstart)
 - [Comprehensive example](#comprehensive-example)
 - [How does it work?](#how-does-it-work)
-- [Multiple inputs](#multiple-inputs)
-- [Using arbitraries explicitly](#using-arbitraries-explicitly)
-- [Generating arbitraries](#generating-arbitraries)
-- [Writing arbitraries manually](#writing-arbitraries-manually)
 - [Customizing the exploration phase](#customizing-the-exploration-phase)
 - [What's up with the name?](#whats-up-with-the-name)
 - [Further info & resources](#further-info--resources)
@@ -55,12 +51,15 @@ Glados(any.lowercaseLetter).test((letter) { ... });
 Glados(any.nonEmptyList(any.positiveIntOrZero)).test((list) { ... });
 ```
 
-You want to test with your own data classes? Use the `@GenerateArbitrary()` annotation!
+You want to test with your own data classes? Use the `@GenerateArbitrary()` annotation and run `pub run build_runner build`!
 If that doesn't work, see [this section](#writing-arbitraries-manually).
 
 ```dart
+part 'my_file.g.dart';
+
 @GenerateArbitrary()
 class MyClass { ... } // enums also work
+
 Glados(any.myClass).test((a) { ... });
 ```
 
@@ -190,47 +189,20 @@ Glados works in two phases:
 - 🌍 **The exploration phase**: Glados generates increasingly complex, random inputs until one breaks the invariant or the maximum number of runs is reached.
 - 🐜 **The shrinking phase**: This phase only happens if Glados found an input that breaks the invariant. In this case, the input is gradually simplified and the smallest input that's still breaking the invariant is returned.
 
-## Multiple inputs
-
-You can use `Glados2` and `Glados3` for Glados tests with multiple inputs.
-If you need support for more inputs, don't hestitate to [open an issue](https://github.com/marcelgarus/glados/issues/new).
-
-```dart
-Glados2<int, int>().test('complicated stuff', (a, b) {
-  ...
-})
-```
-
-## Using arbitraries explicitly
-
 Arbitraries are responsible for generating and shrinking values. The `Arbitrary` class has two methods:
 
 - `T generate(Random random, int size)` generates a new value of type `T`, using `random` as a source for randomness. The `size` argument is used as a rough estimate on how big or complex the returned value should be.  
   For example, the arabitrary for `int` produces `int`s in the range from `-size` to `size`.
 - `Iterable<T> shrink(T input)` takes a value and returns an `Iterable` containing similar, but smaller values. Smaller means that calling `shrink` repeatedly on the smaller values and their children etc., the program should eventually terminate (aka the transitive hull with regard to `shrink` should be finite and acyclic).
 
+The basic types all have corresponding arbitraries implemented. All arbitraries can be found on `any`.
 
-The basic types all have corresponding arbitraries implemented. More arbitraries can be found on `any`.
-
-For example, if you want to test some code only with lowercase letters, you can write:
-
-```dart
-Glados(any.lowercaseLetters).test('text test', (text) { ... });
-```
-
-## Generating arbitraries
-
-You can let Glados generate arbitraries for your types by annotating them with `@GenerateArbitrary` and then running `pub run build_runner build`.
-This works for both data classes and enums.
-
-## Writing arbitraries manually
-
-Sometimes it makes sense to write new arbitraries.
+For most of the types, there are either arbitraries defined in other packages, or you'll be able to generate arbitraries using the `@GenerateArbitrary()` annotation (see [Quickstart](#quickstart)).
+Sometimes it makes sense to write new arbitraries manually.
 
 For example, if you test code that expects email addresses, it may be inefficient to test the code with random `String`s; if the tested code contains some sanity checks at the beginning, only a tiny fraction of values actually passes through the rest of the code.
 
-In that case, create a custom arbitrary.
-To do that, add an extension on `Any`, which is a namespace for arbitraries:
+In that case, create a custom arbitrary:
 
 ```dart
 extension EmailAdressArbitrary on Any {
@@ -239,32 +211,20 @@ extension EmailAdressArbitrary on Any {
     shrink: (emailAddress) => /* code for shrinking the given email address */,
   );
 }
-```
 
-Then, you can use that arbitrary like this:
+...
 
-```dart
 Glados(any.emailAddress).test('email test', (emailAddress) { ... });
 ```
 
 You can also set an arbitrary as the default arbitrary for a type:
 
 ```dart
-// Use the email arbitrary for all Strings.
 Any.setDefault<String>(any.emailAddress);
-```
 
-Then, you don't need to explicitly provide the arbitrary to `Glados` anymore. Instead, `Glados` will use it based on given type parameters:
-
-```dart
-// This will now use the any.emailAddress arbitrary, because it was set as the
-// default for String before.
+// Uses the any.emailAddress arbitrary based on the type parameters.
 Glados<String>().test('blub', () { ... });
 ```
-
-<!--
-TODO: package ecosystem arbitrary support
--->
 
 ## Customizing the exploration phase
 
