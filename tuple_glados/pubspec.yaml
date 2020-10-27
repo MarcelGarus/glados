@@ -1,0 +1,6 @@
+name: tuple_glados
+description: "Provides Glados arbitraries for types from the tuple package."
+
+dependencies:
+  tuple: ^1.0.3
+  glados: ^0.1.6
