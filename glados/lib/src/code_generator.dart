@@ -6,11 +6,20 @@ import 'package:build/build.dart';
 import 'package:source_gen/source_gen.dart';
 
 /// Annotation for generating arbitraries.
-class GenerateArbitrary {
-  const GenerateArbitrary([this.name]);
-
-  final String name;
+class GladosAnnotation {
+  const GladosAnnotation();
 }
+
+/// Annotation for auto-generating Glados generators.
+///
+/// 1. Annotate a data class or enum with this `@glados` annotation.
+/// 2. Add a `part 'my_file.g.dart';` directive below your imports.
+/// 3. Run `pub run build_runner build` in the command line.
+///
+/// If that doesn't work, you'll probably need to write a generator manually.
+/// But now worries, just have a look at other generators defined on `any` –
+/// it's really not that hard.
+const glados = GladosAnnotation();
 
 /// Builds generators for `build_runner` to run.
 Builder getArbitraryBuilder(BuilderOptions options) {
@@ -28,22 +37,11 @@ class ArbitraryGenerator extends Generator {
     for (final class_ in annotatedClasses) {
       final name = class_.name;
       final getterName = name.toLowerCamelCase();
-      code.writeln('extension Arbitrary$name on Any {');
+      code.writeln('extension Any$name on Any {');
 
       if (class_.isEnum) {
-        code
-          ..writeln('Arbitrary<$name> get $getterName => arbitrary(')
-          ..writeln('  generate: (random, size) {')
-          ..writeln('    return $name.values[random.nextInt(')
-          ..writeln('      size.clamp(0, $name.values.length - 1),')
-          ..writeln('    )];')
-          ..writeln('  },')
-          ..writeln('  shrink: ($getterName) sync* {')
-          ..writeln('    if ($getterName.index > 0) {')
-          ..writeln('      yield $name.values[$getterName.index - 1];')
-          ..writeln('    }')
-          ..writeln('  },')
-          ..writeln(');');
+        code.writeln(
+            'Generator<$name> get $getterName => choose($name.values);');
       } else {
         // TODO: assert: has only initializing formals and no extra fields.
         final constructor = class_.unnamedConstructor;
@@ -69,42 +67,34 @@ class ArbitraryGenerator extends Generator {
                 "You'll need to create an arbitrary manually.");
           }
         }
+        if (parameters.length > 10) {
+          throw Exception("Classes with more than 10 fields are not supported "
+              "yet. Here's what you should do:\n\n"
+              "1. Open an issue about that.\n"
+              "2. Work around that by creating a generator manually.\n\n"
+              "To make the first point easier, here's a link to a fitting "
+              "issue template: TODO");
+        }
         code
-          ..writeln('Arbitrary<${class_.name}> $getterName(')
+          ..writeln('Generator<${class_.name}> $getterName(')
           ..writeln([
             for (final parameter in parameters)
-              'Arbitrary<${parameter.type.getDisplayString(withNullability: false)}> '
-                  '${parameter.name}Arbitrary,'
+              'Generator<${parameter.typeString}> ${parameter.name}Generator,'
           ].joinLines())
-          ..writeln(') => arbitrary(')
-          ..writeln('  generate: (random, size) {')
+          ..writeln(') => combine${parameters.length}(')
+          ..writeln([
+            for (final parameter in parameters) '${parameter.name}Generator,'
+          ].joinLines())
+          ..writeln('  (${parameters.map((p) => p.name).join(', ')}) {')
           ..writeln('    return $name(')
           ..writeln([
-            for (final parameter in parameters) ...[
-              if (parameter.isNamed) '${parameter.name}: ',
-              '${parameter.name}Arbitrary.generate(random, size),'
-            ],
+            for (final parameter in parameters)
+              [
+                if (parameter.isNamed) '${parameter.name}: ',
+                '${parameter.name},'
+              ].join(),
           ].joinLines())
           ..writeln('    );')
-          ..writeln('  },')
-          ..writeln('  shrink: ($getterName) sync* {')
-          ..writeln([
-            for (final parameter in parameters) ...[
-              'for (final ${parameter.name} in '
-                  '${parameter.name}Arbitrary.shrink($getterName.${parameter.name})) {',
-              '  yield $name(',
-              for (final p in parameters) ...[
-                if (p.isNamed) '${p.name}: ',
-                if (p == parameter)
-                  '${parameter.name},'
-                else
-                  '$getterName.${p.name},',
-              ],
-              '  );',
-              '}',
-            ],
-          ].joinLines())
-          ..writeln('  ')
           ..writeln('  },')
           ..writeln(');');
       }
@@ -117,8 +107,12 @@ class ArbitraryGenerator extends Generator {
 }
 
 extension on Element {
-  bool get wantsArbitrary => TypeChecker.fromRuntime(GenerateArbitrary)
+  bool get wantsArbitrary => TypeChecker.fromRuntime(GladosAnnotation)
       .hasAnnotationOf(this, throwOnUnresolved: false);
+}
+
+extension on ParameterElement {
+  String get typeString => type.getDisplayString(withNullability: false);
 }
 
 extension on String {

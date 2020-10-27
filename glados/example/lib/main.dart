@@ -1,5 +1,4 @@
 import 'package:glados/glados.dart';
-import 'package:glados/src/annotations.dart';
 import 'package:test/test.dart';
 
 part 'main.g.dart';
@@ -35,7 +34,7 @@ void main() {
   });
 }
 
-@GenerateArbitrary()
+@glados
 class User {
   User(this.email, this.password, {this.age});
 
@@ -44,22 +43,9 @@ class User {
   final int age;
 }
 
-@GenerateArbitrary()
+@glados
 enum Ripeness {
   ripe,
   medium,
   unripe,
-}
-
-extension ArbitraryRipeness on Any {
-  Arbitrary<Ripeness> get ripeness => arbitrary(
-        generate: (random, size) {
-          return [
-            Ripeness.ripe,
-            Ripeness.medium,
-            Ripeness.unripe
-          ][random.nextInt(3)];
-        },
-        shrink: (_) => [],
-      );
 }

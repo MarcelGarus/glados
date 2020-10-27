@@ -6,57 +6,26 @@ part of 'main.dart';
 // ArbitraryGenerator
 // **************************************************************************
 
-extension ArbitraryRipeness on Any {
-  Arbitrary<Ripeness> get ripeness => arbitrary(
-        generate: (random, size) {
-          return Ripeness.values[random.nextInt(
-            size.clamp(0, Ripeness.values.length - 1),
-          )];
-        },
-        shrink: (ripeness) sync* {
-          if (ripeness.index > 0) {
-            yield Ripeness.values[ripeness.index - 1];
-          }
-        },
-      );
+extension AnyRipeness on Any {
+  Generator<Ripeness> get ripeness => choose(Ripeness.values);
 }
 
-extension ArbitraryUser on Any {
-  Arbitrary<User> user(
-    Arbitrary<String> emailArbitrary,
-    Arbitrary<String> passwordArbitrary,
-    Arbitrary<int> ageArbitrary,
+extension AnyUser on Any {
+  Generator<User> user(
+    Generator<String> emailGenerator,
+    Generator<String> passwordGenerator,
+    Generator<int> ageGenerator,
   ) =>
-      arbitrary(
-        generate: (random, size) {
+      combine3(
+        emailGenerator,
+        passwordGenerator,
+        ageGenerator,
+        (email, password, age) {
           return User(
-            emailArbitrary.generate(random, size),
-            passwordArbitrary.generate(random, size),
-            age: ageArbitrary.generate(random, size),
+            email,
+            password,
+            age: age,
           );
-        },
-        shrink: (user) sync* {
-          for (final email in emailArbitrary.shrink(user.email)) {
-            yield User(
-              email,
-              user.password,
-              age: user.age,
-            );
-          }
-          for (final password in passwordArbitrary.shrink(user.password)) {
-            yield User(
-              user.email,
-              password,
-              age: user.age,
-            );
-          }
-          for (final age in ageArbitrary.shrink(user.age)) {
-            yield User(
-              user.email,
-              user.password,
-              age: age,
-            );
-          }
         },
       );
 }
