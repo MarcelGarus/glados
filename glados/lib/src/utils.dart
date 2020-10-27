@@ -16,7 +16,7 @@ class Statistics {
   var shrinkCounter = 0;
 }
 
-extension ChoosingRandomly on Random {
+extension RandomUtils on Random {
   T choose<T>(List<T> list) => list[nextInt(nextInt(list.length))];
   int nextIntInRange(int min, int max) {
     assert(min == null || max == null || min <= max);
