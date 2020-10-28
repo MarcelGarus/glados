@@ -1,3 +1,24 @@
+## 0.2.0
+
+- Make architecture more flexible: Split arbitraries into `Generator`s and `Shrinkable`s.
+- Add generators:
+  - Meta generators: `simple`, `always`, `choose`, `either`, `combine2`, `combine3`, `combine4`, `combine5`, `combine6`, `combine7`, `combine8`, `combine9`, `combine10`
+  - `int` generators: `intInRange`, `positiveInt`, `positiveIntOrZero`, `negativeInt`, `negativeIntOrZero`, `uint8`, `uint16`, `uint32`, `uint64`, `int8`, `int16`, `int32`, `int64`
+  - `double` generators: `doubleInRange`, `positiveDoubleOrZero`, `negativeDouble`
+  - `num` generator: `numInRange`
+  - `BigInt` generator: `bigIntInRange`
+  - `List` generators: `listWithLengthInRange`, `listWithLength`
+  - `Set` generators: `setWithLengthInRange`, `setWithLength`, `nonEmptySet`
+  - `DateTime` generators: `dateTimeBeforeEpoch`, `dateTimeAfterEpoch`
+  - `Duration` generators: `positiveDuration`, `negativeDuration`
+  - `String` generators: `letterOrDigit`
+- Improve shrinking for `double` generators: The decimal digits of values are now shrunk too (e.g. `2.2` is considered less complex than `2.1008`). 
+- Improve the code generator:
+  - It uses the new meta generators to generate more concise code.
+  - It provides a much better error experience.
+- Make readme more concisee.
+- Make package more lightweight by moving sticker image to a separate location and removing git files.
+
 ## 0.1.6
 
 - Add quickstart section to readme.
