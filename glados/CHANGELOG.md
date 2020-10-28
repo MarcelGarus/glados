@@ -1,3 +1,7 @@
+## 0.2.1
+
+- Update readme.
+
 ## 0.2.0
 
 - Make architecture more flexible: Split arbitraries into `Generator`s and `Shrinkable`s.
