@@ -1,3 +1,8 @@
+## 0.2.2
+
+- Fix analysis errors.
+- Make `NoGeneratorFound` error much more helpful.
+
 ## 0.2.1
 
 - Update readme.

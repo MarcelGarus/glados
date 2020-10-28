@@ -52,7 +52,7 @@ Glados(any.nonEmptyList(any.positiveIntOrZero)).test((list) { ... });
 ```
 
 You want to test with your own data classes? Use the `@glados` annotation and run `pub run build_runner build`!
-If that doesn't work, see [this section](#writing-arbitraries-manually).
+If that doesn't work, see [this section](#how-does-it-work).
 
 ```dart
 part 'my_file.g.dart';
