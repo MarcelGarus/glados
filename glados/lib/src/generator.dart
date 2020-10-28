@@ -1,40 +1,39 @@
 import 'dart:math';
 
 /// An [Generator] makes it possible to use [Glados] to test type [T].
-/// Generates a new [ShrinkableValue] of type [T], using [size] as a rough
+/// Generates a new [Shrinkable] of type [T], using [size] as a rough
 /// complexity estimate. The [random] instance should be used as a source for
 /// all pseudo-randomness.
-typedef Generator<T> = ShrinkableValue<T> Function(Random random, int size);
+typedef Generator<T> = Shrinkable<T> Function(Random random, int size);
 
 /// A wrapper for a value that knows how to shrink itself.
-abstract class ShrinkableValue<T> {
-  factory ShrinkableValue(
-          T value, Iterable<ShrinkableValue<T>> Function() shrink) =
+abstract class Shrinkable<T> {
+  factory Shrinkable(T value, Iterable<Shrinkable<T>> Function() shrink) =
       _InlineShrinkableValue<T>;
 
   /// The actual value itself.
   T get value;
 
-  /// Generates an [Iterable] of [ShrinkableValue]s that fulfill the following
+  /// Generates an [Iterable] of [Shrinkable]s that fulfill the following
   /// criteria:
   ///
   /// - They are _similar_ to this: They only differ in little ways.
   /// - They are _simpler_ than this: The transitive hull is finite acyclic. If
   ///   you would call [shrink] on all returned values and on the values
   ///   returned by them etc., this process should terminate sometime.
-  Iterable<ShrinkableValue<T>> shrink();
+  Iterable<Shrinkable<T>> shrink();
 }
 
-/// An inline versions for the [ShrinkableValue].
-class _InlineShrinkableValue<T> implements ShrinkableValue<T> {
+/// An inline versions for the [Shrinkable].
+class _InlineShrinkableValue<T> implements Shrinkable<T> {
   _InlineShrinkableValue(this.value, this._shrinker);
 
   @override
   final T value;
-  final Iterable<ShrinkableValue<T>> Function() _shrinker;
+  final Iterable<Shrinkable<T>> Function() _shrinker;
 
   @override
-  Iterable<ShrinkableValue<T>> shrink() => _shrinker();
+  Iterable<Shrinkable<T>> shrink() => _shrinker();
 }
 
 /// Useful methods on [Generator]s.
@@ -58,17 +57,17 @@ extension GeneratorUtils<T> on Generator<T> {
   }
 }
 
-class MappedShrinkableValue<T, R> implements ShrinkableValue<R> {
+class MappedShrinkableValue<T, R> implements Shrinkable<R> {
   MappedShrinkableValue(this.originalValue, this.mapper);
 
-  final ShrinkableValue<T> originalValue;
+  final Shrinkable<T> originalValue;
   final R Function(T value) mapper;
 
   @override
   R get value => mapper(originalValue.value);
 
   @override
-  Iterable<ShrinkableValue<R>> shrink() {
+  Iterable<Shrinkable<R>> shrink() {
     return originalValue.shrink().map((value) {
       return MappedShrinkableValue(value, mapper);
     });
