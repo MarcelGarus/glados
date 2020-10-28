@@ -5,6 +5,8 @@ import 'package:build/src/builder/build_step.dart';
 import 'package:build/build.dart';
 import 'package:source_gen/source_gen.dart';
 
+import 'utils.dart';
+
 /// Annotation for generating arbitraries.
 class GladosAnnotation {
   const GladosAnnotation();
@@ -209,15 +211,6 @@ extension on Element {
 
 extension on ParameterElement {
   String get typeString => type.getDisplayString(withNullability: false);
-}
-
-extension on String {
-  String toLowerCamelCase() => this[0].toLowerCase() + substring(1);
-}
-
-extension on List<String> {
-  String joinLines() => join('\n');
-  String joinParts() => join('\n\n');
 }
 
 String _buildIssueLink(String title, String body) {

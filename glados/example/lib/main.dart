@@ -1,7 +1,7 @@
 import 'package:glados/glados.dart';
 import 'package:test/test.dart';
 
-part 'main.g.dart';
+// part 'main.g.dart';
 
 int max(List<int> input) {
   if (input.isEmpty) return null;
@@ -25,11 +25,11 @@ void main() {
     Glados(any.nonEmptyList(any.int)).test('is in the list', (list) {
       expect(list, contains(max(list)));
     });
-    Glados(any.nonEmptyList(any.int)).test('is >= all items', (list) {
-      var maximum = max(list);
-      for (var item in list) {
-        expect(maximum, greaterThanOrEqualTo(item));
-      }
+    Glados<List<List<int>>>().test('is >= all items', (list) {
+      // var maximum = max(list);
+      // for (var item in list) {
+      //   expect(maximum, greaterThanOrEqualTo(item));
+      // }
     });
   });
 }
