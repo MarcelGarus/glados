@@ -36,11 +36,33 @@ void main() {
 
 @glados
 class User {
-  User(this.email, this.password, {this.age});
+  User.blub(
+    this.email,
+    this.password, {
+    this.age,
+    this.foo,
+    this.bar,
+    this.baz,
+    this.blubbel,
+    this.schub,
+    this.shooze,
+    this.whooze,
+    this.zoooooome,
+  });
 
   final String email;
   final String password;
   final int age;
+  final Duration foo;
+  final double bar;
+  final DateTime baz;
+  final BigInt blubbel;
+  final int schub;
+  final int shooze;
+  final bool whooze;
+  final bool zoooooome;
+
+  int get doubleAge => age * 2;
 }
 
 @glados
