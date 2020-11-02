@@ -36,37 +36,23 @@ class NoGeneratorFound implements Exception {
         ]),
       ]),
       Paragraph('So, how can you create a generator?'),
-      if (richType.hasGenerics)
-        ..._helpForGenericType(richType)
-      else if (richType == RichType('String')) ...[
-        Paragraph("For Strings, there's no default generator yet. Instead, "
-            'there are a few specialized ones. These might be interesting:'),
-        Code([
-          'any.lowercaseLetter',
-          'any.uppercaseLetter',
-          'any.letter',
-          'any.digit',
-          'any.letterOrDigit',
+      if (richType.hasGenerics) ...[
+        Paragraph("Because you're trying to generate a type with generics, you "
+            'should compose simpler generators:'),
+        Code([richType.toGeneratorString()]),
+        BulletList([
+          for (final typeName in richType.allTypes()) ...[
+            Paragraph.noNl('any.${typeName.toLowerCamelCase()}'),
+            ..._helpForSimpleType(typeName),
+          ],
         ]),
-        Paragraph("Maybe, a default String generator will be supported in the "
-            'future. But because generating valid Unicode Strings is more '
-            "difficult than initially thought, this isn't supported yet. If "
-            'you know your way around Strings, maybe you find some time for '
-            'filing a PR?'),
+      ] else ...[
+        Paragraph("Your generator should probably look like this:"),
+        ..._helpForSimpleType(richType.name.toString()),
       ],
-      if (!richType.hasGenerics) ...[
-        Paragraph('If you want to make your generator available at multiple '
-            'places, you can add it as an extension method:'),
-        Code([
-          'extension Any$type on Any {',
-          '  Generator<$type> get ${type.lowerCamelCased} {',
-          '    // TODO: Write the generator.',
-          '  }',
-          '}',
-        ]),
-      ],
-      Paragraph('For more information on writing your own generator, '
-          'have a look at https://pub.dev/packages/glados#how-does-it-work.'),
+      Paragraph(),
+      Paragraph('For more information on writing your own generator, have a '
+          'look at https://pub.dev/packages/glados#how-does-it-work.'),
     ]).toString();
   }
 
@@ -85,46 +71,34 @@ class NoGeneratorFound implements Exception {
     ].join();
   }
 
-  Iterable<StructuredText> _helpForGenericType(RichType richType) sync* {
-    yield Paragraph("Because you're trying to generate a type with generics, "
-        'you should compose simpler generators:');
-    yield Code([richType.toGeneratorString()]);
+  Iterable<StructuredText> _helpForSimpleType(String typeName) sync* {
+    final packages = typeNameToPackages[type] ?? [];
 
-    yield BulletList([
-      for (final type in richType.allTypes())
-        () {
-          final generatorName = 'any.${type.toLowerCamelCase()}';
-          final packages = typeNameToPackages[type] ?? [];
-
-          if (packages.isEmpty) {
-            return Paragraph.noNl('$generatorName: You probably need to write '
-                'this one on your own.');
-          } else if (packages.length == 1) {
-            final package = packages.single;
-            if (package == builtIn) {
-              return Paragraph.noNl('$generatorName: Is this the $type from '
-                  '$package? '
-                  "There's already a built-in generator.");
-            }
-            return Paragraph.noNl("$generatorName: Is it from $package? The "
-                '${package.gladosName} package contains a generator for it.');
-          } else {
-            return Flow([
-              Paragraph.noNl("$generatorName: From which package is $type?"),
-              BulletList([
-                for (final package in packages)
-                  if (package == builtIn)
-                    Paragraph.noNl('$package: Already built-in.')
-                  else
-                    Paragraph.noNl(
-                        "$package: There's a ${package.gladosName} package."),
-              ]),
-            ]);
-          }
-        }()
-    ]);
-
-    yield Paragraph();
+    if (packages.isEmpty) {
+      yield Paragraph.noNl(
+          'You probably need to write this generator on your own.');
+    } else if (packages.length == 1) {
+      final package = packages.single;
+      if (package == builtIn) {
+        yield Paragraph.noNl("Is this the $type from $package? There's already "
+            "a built-in generator.");
+      } else {
+        yield Paragraph.noNl('Is it from $package? The ${package.gladosName} '
+            'package contains a generator for it.');
+      }
+    } else {
+      yield Flow([
+        Paragraph.noNl("From which package is $type?"),
+        BulletList([
+          for (final package in packages)
+            if (package == builtIn)
+              Paragraph.noNl('$package: Already built-in.')
+            else
+              Paragraph.noNl(
+                  "$package: There's a ${package.gladosName} package."),
+        ]),
+      ]);
+    }
   }
 }
 
