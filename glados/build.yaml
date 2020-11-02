@@ -1,8 +1,0 @@
-builders:
-  glados:
-    import: "package:glados/src/code_generator.dart"
-    builder_factories: ["getArbitraryBuilder"]
-    build_extensions: { ".dart": ["glados.g.part"] }
-    auto_apply: dependents
-    build_to: cache
-    applies_builders: ["source_gen|combining_builder"]

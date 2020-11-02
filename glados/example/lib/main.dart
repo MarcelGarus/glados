@@ -34,7 +34,6 @@ void main() {
   });
 }
 
-@glados
 class User {
   User.blub(
     this.email,
@@ -65,7 +64,6 @@ class User {
   int get doubleAge => age * 2;
 }
 
-@glados
 enum Ripeness {
   ripe,
   medium,
