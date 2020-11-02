@@ -4,6 +4,7 @@ import 'package:meta/meta.dart';
 import 'package:test/test.dart' as test_package;
 
 import 'any.dart';
+import 'errors.dart';
 import 'generator.dart';
 import 'utils.dart';
 
@@ -107,7 +108,7 @@ class Explore {
 /// See the [Explore] doc comments for more information.
 class Glados<T> {
   Glados([Generator<T> generator, Explore explore])
-      : this.generator = generator ?? Any.defaultFor<T>(),
+      : this.generator = generator ?? Any.defaultForWithBeautifulError<T>(1, 0),
         this.explore = explore ?? Explore();
 
   final Generator<T> generator;
@@ -183,8 +184,10 @@ class Glados2<First, Second> {
     Generator<First> firstGenerator,
     Generator<Second> secondGenerator,
     Explore explore,
-  ])  : this.firstGenerator = firstGenerator ?? Any.defaultFor<First>(),
-        this.secondGenerator = secondGenerator ?? Any.defaultFor<Second>(),
+  ])  : this.firstGenerator =
+            firstGenerator ?? Any.defaultForWithBeautifulError<First>(2, 0),
+        this.secondGenerator =
+            secondGenerator ?? Any.defaultForWithBeautifulError<Second>(2, 1),
         this.explore = explore ?? Explore();
 
   final Generator<First> firstGenerator;
@@ -208,9 +211,12 @@ class Glados3<First, Second, Third> {
     Generator<Second> secondGenerator,
     Generator<Third> thirdGenerator,
     Explore explore,
-  ])  : this.firstGenerator = firstGenerator ?? Any.defaultFor<First>(),
-        this.secondGenerator = secondGenerator ?? Any.defaultFor<Second>(),
-        this.thirdGenerator = thirdGenerator ?? Any.defaultFor<Third>(),
+  ])  : this.firstGenerator =
+            firstGenerator ?? Any.defaultForWithBeautifulError<First>(3, 0),
+        this.secondGenerator =
+            secondGenerator ?? Any.defaultForWithBeautifulError<Second>(3, 1),
+        this.thirdGenerator =
+            thirdGenerator ?? Any.defaultForWithBeautifulError<Third>(3, 2),
         this.explore = explore ?? Explore();
 
   final Generator<First> firstGenerator;

@@ -3,8 +3,8 @@ import 'dart:math';
 import 'package:meta/meta.dart';
 
 import 'anys.dart';
+import 'errors.dart';
 import 'generator.dart';
-import 'utils.dart';
 
 /// The [any] singleton, providing a namespace for [Generator]s.
 ///
@@ -26,7 +26,15 @@ class Any {
   static void setDefault<T>(Generator<T> generator) =>
       _defaults[_TypeWrapper<T>()] = generator;
   static Generator<T> defaultFor<T>() =>
-      _defaults[_TypeWrapper<T>()] ?? (throw NoGeneratorFound(T));
+      _defaults[_TypeWrapper<T>()] ?? (throw InternalNoGeneratorFound());
+  static Generator<T> defaultForWithBeautifulError<T>(
+      int numGladosArgs, int typeIndex) {
+    try {
+      return defaultFor<T>();
+    } on InternalNoGeneratorFound {
+      throw NoGeneratorFound(numGladosArgs, typeIndex, T);
+    }
+  }
 }
 
 class _TypeWrapper<T> {
