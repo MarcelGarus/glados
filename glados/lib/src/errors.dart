@@ -14,7 +14,7 @@ class NoGeneratorFound implements Exception {
   final Type type;
 
   String toString() {
-    final richType = RichType.from(type);
+    final richType = RichType.fromType(type);
     return Flow([
       Paragraph("Glados couldn't find a generator for $type."),
       Paragraph.noNl('This type is used in your Glados call:'),

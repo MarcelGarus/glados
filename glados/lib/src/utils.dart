@@ -53,9 +53,15 @@ extension LowerCasedType on Type {
 /// While you shouldn't rely on [Type.toString()] to return something useful, we
 /// depend on it _only_ for better developer experience.
 class RichType {
-  factory RichType.from(Type type) =>
-      _TypeParser(type.toString().replaceAll(' ', '')).parse();
-  RichType(this.name, [this.children = const []]);
+  factory RichType.fromType(Type type) => RichType.fromString(type.toString());
+  factory RichType.fromString(String string) {
+    final parser = _TypeParser(string.replaceAll(' ', ''));
+    final type = parser.parse();
+    return parser.cursor == parser.string.length ? type : null;
+  }
+  RichType(this.name, [this.children = const []])
+      : assert(name != null),
+        assert(name.isNotEmpty);
 
   final String name;
   final List<RichType> children;
@@ -63,6 +69,7 @@ class RichType {
   bool get hasGenerics => children.isNotEmpty;
   Set<String> allTypes() =>
       [name, ...children.expand((child) => child.allTypes())].toSet();
+
   bool operator ==(Object other) =>
       other is RichType &&
       name == other.name &&
@@ -74,7 +81,15 @@ class RichType {
   int get hashCode =>
       name.hashCode +
       children.map((child) => child.hashCode).fold(0, (a, b) => a + b);
-  String toString() => '$name<${children.join(', ')}>';
+
+  String toString() {
+    final buffer = StringBuffer(name);
+    if (children.isNotEmpty) {
+      buffer.write('<${children.join(', ')}>');
+    }
+    return buffer.toString();
+  }
+
   String toGeneratorString() {
     final string = StringBuffer('any.${name.toLowerCamelCase()}');
     if (children.isNotEmpty) {
@@ -95,6 +110,7 @@ class _TypeParser {
 
   String get current => cursor < string.length ? string[cursor] : '';
   void advance() => cursor++;
+  bool get isDone => cursor == string.length;
 
   RichType parse() {
     var name = StringBuffer();
@@ -103,6 +119,7 @@ class _TypeParser {
       name.write(current);
       advance();
     }
+    if (name.isEmpty) return null;
     if (current == '>' || current == ',') {
       return RichType(name.toString());
     }
@@ -111,6 +128,8 @@ class _TypeParser {
         advance();
         types.add(parse());
       }
+      if (current != '>') return null;
+      advance();
     }
     return RichType(name.toString(), types);
   }
