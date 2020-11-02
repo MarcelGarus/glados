@@ -105,7 +105,17 @@ class NoGeneratorFound implements Exception {
 /// For the same input, an invariance sometimes throws an exceptions and
 /// sometimes doesn't. Invariants should be deterministic though.
 class InvarianceNotDeterministic implements Exception {
-  String toString() => 'The invariance was called twice with the same value. '
-      'The first time, an exception was thrown, the second time, it executed '
-      'normally. The invariance has to be deterministic.';
+  InvarianceNotDeterministic(this.input);
+
+  final dynamic input;
+
+  @override
+  String toString() {
+    return Flow([
+      Paragraph('An invariance behaved undeterministically. For the input '
+          '$input, it failed the first time, but succeeded the second time.'),
+      Paragraph('Make sure that if given the same input, the invariance '
+          'always behaves the same way.'),
+    ]).toString();
+  }
 }

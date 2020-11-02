@@ -171,7 +171,7 @@ class Glados<T> {
             '\nFailing for input: $shrunkInput');
         body(shrunkInput); // This should fail the test again.
 
-        throw InvarianceNotDeterministic();
+        throw InvarianceNotDeterministic(shrunkInput);
       },
     );
   }
