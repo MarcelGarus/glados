@@ -41,10 +41,12 @@ class NoGeneratorFound implements Exception {
             'should compose simpler generators:'),
         Code([richType.toGeneratorString()]),
         BulletList([
-          for (final typeName in richType.allTypes()) ...[
-            Paragraph.noNl('any.${typeName.toLowerCamelCase()}'),
-            ..._helpForSimpleType(typeName),
-          ],
+          for (final typeName in richType.allTypes())
+            Flow([
+              Paragraph.noNl('any.${typeName.toLowerCamelCase()}:'),
+              ..._helpForSimpleType(typeName),
+              Paragraph(),
+            ]),
         ]),
       ] else ...[
         Paragraph("Your generator should probably look like this:"),
@@ -52,7 +54,7 @@ class NoGeneratorFound implements Exception {
       ],
       Paragraph(),
       Paragraph('For more information on writing your own generator, have a '
-          'look at https://pub.dev/packages/glados#how-does-it-work.'),
+          'look at https://pub.dev/packages/glados#how-to-write-generators.'),
     ]).toString();
   }
 
@@ -72,7 +74,7 @@ class NoGeneratorFound implements Exception {
   }
 
   Iterable<StructuredText> _helpForSimpleType(String typeName) sync* {
-    final packages = typeNameToPackages[type] ?? [];
+    final packages = typeNameToPackages[typeName] ?? [];
 
     if (packages.isEmpty) {
       yield Paragraph.noNl(
@@ -80,15 +82,15 @@ class NoGeneratorFound implements Exception {
     } else if (packages.length == 1) {
       final package = packages.single;
       if (package == builtIn) {
-        yield Paragraph.noNl("Is this the $type from $package? There's already "
-            "a built-in generator.");
+        yield Paragraph.noNl("Is this the $typeName from $package? There's "
+            "already a built-in generator.");
       } else {
         yield Paragraph.noNl('Is it from $package? The ${package.gladosName} '
             'package contains a generator for it.');
       }
     } else {
       yield Flow([
-        Paragraph.noNl("From which package is $type?"),
+        Paragraph.noNl("From which package is $typeName?"),
         BulletList([
           for (final package in packages)
             if (package == builtIn)

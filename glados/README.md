@@ -15,6 +15,7 @@ Here are some benefits:
 - [Quickstart](#quickstart)
 - [Comprehensive example](#comprehensive-example)
 - [How does it work?](#how-does-it-work)
+- [How to write generators](#how-to-write-generators)
 - [Customizing the exploration phase](#customizing-the-exploration-phase)
 - [What's up with the name?](#whats-up-with-the-name)
 - [Further info & resources](#further-info--resources)
@@ -51,17 +52,7 @@ Glados(any.lowercaseLetter).test((letter) { ... });
 Glados(any.nonEmptyList(any.positiveIntOrZero)).test((list) { ... });
 ```
 
-You want to test with your own data classes? Use the `@glados` annotation and run `pub run build_runner build`!
-If that doesn't work, see [this section](#how-does-it-work).
-
-```dart
-part 'my_file.g.dart';
-
-@glados
-class MyClass { ... } // enums also work
-
-Glados(any.myClass).test((a) { ... });
-```
+You want to test with your own data classes? [Here's how to write generators.](#how-to-write-generators).
 
 You can also [customize the size of the generated inputs](#customizing-the-exploration-phase).
 
@@ -199,33 +190,43 @@ Smaller means that if you would call `shrink` repeatedly on the smaller values a
 
 The basic types all have corresponding generators implemented. All generators can be found on `any`.
 
-For most of the types, there are either generators defined in other packages, or you'll be able to generate generators using the `@glados` annotation (see [Quickstart](#quickstart)).
-Sometimes tough, it makes sense to write new generators manually.
+## How to write generators
 
-For example, if you test code that expects email addresses, it may be inefficient to test the code with random `String`s; if the tested code contains some sanity checks at the beginning, only a tiny fraction of values actually passes through the rest of the code.
-
-In that case, create a custom generator:
+For simple data classes with some fields, this is how the generator might look like:
 
 ```dart
-extension EmailAdressArbitrary on Any {
-  Arbitrary<String> get emailAddress => simple(
-    generate: (random, size) => /* code for generating email addresses */,
-    shrink: (emailAddress) => /* code for shrinking the given email address */,
-  );
+class User {
+  final String name;
+  final int age;
 }
 
-...
-
-Glados(any.emailAddress).test('email test', (emailAddress) { ... });
+extension AnyUser on Any {
+  Generator<User> get user => combine3(any.string, any.int, (name, age) {
+    return User(name, age);
+  });
+}
 ```
 
-You can also set a generator as the default generator for a type:
+For enums, this is how the generator might look like:
+
+```dart
+enum Ripeness { ripe, unripe }
+
+extension AnyRipeness on Any {
+  Generator<Ripeness> get ripeness => choose(Ripeness.values);
+}
+```
+
+If you want to customize generators further, like only generate valid email addresses, you might need to work on a lower level of abstraction.
+Just check out the source code of exisitng generators for some examples.
+
+Here's how to set a generator as the default generator for a type:
 
 ```dart
 Any.setDefault<String>(any.emailAddress);
 
 // Uses the any.emailAddress generator based on the type parameters.
-Glados<String>().test('blub', () { ... });
+Glados<String>().test('blub', (email) { ... });
 ```
 
 ## Customizing the exploration phase
