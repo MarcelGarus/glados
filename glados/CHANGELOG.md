@@ -1,14 +1,18 @@
+## 0.3.1
+
+- Fix analysis warnings.
+
 ## 0.3.0
 
 - Make `NoGeneratorFound` error even more helpful by suggesting packages.
 - Make `InvariantNotDeterministic` error more helpful.
 - Remove code generator, because higher-level primitives make writing generators just a few lines of code.
-- Fix analysis error.
+- Fix analysis warnings.
 
 ## 0.2.2
 
 - Make `NoGeneratorFound` error much more helpful.
-- Fix analysis errors.
+- Fix analysis warnings.
 
 ## 0.2.1
 
