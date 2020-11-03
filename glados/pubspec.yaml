@@ -1,6 +1,6 @@
 name: glados
 description: "🍰 A property-based testing framework that tries to break your invariances."
-version: 0.3.1
+version: 0.3.2
 
 repository: https://github.com/marcelgarus/glados
 

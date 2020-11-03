@@ -1,3 +1,7 @@
+## 0.3.2
+
+- Fix more analysis warnings.
+
 ## 0.3.1
 
 - Fix analysis warnings.
