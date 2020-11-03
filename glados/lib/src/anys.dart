@@ -1,5 +1,4 @@
 import 'dart:core' as core;
-import 'dart:math';
 
 import 'package:characters/characters.dart';
 
@@ -58,7 +57,6 @@ extension DoubleAnys on Any {
           // Round to some digets.
           for (var i = 10; i < 100000; i *= 10) {
             final rounded = (input * i).round() / i;
-            // TODO: Also check that the rounded value is still inside the bounds.
             if (rounded != i) yield rounded;
           }
         },
@@ -69,8 +67,9 @@ extension DoubleAnys on Any {
 }
 
 extension NumAnys on Any {
-  /// A generator for [double]s. [min] is inclusive, [max] is exclusive.
-  Generator<core.num> numInRange(core.num min, core.num max) => null /* TODO */;
+  // A generator for [double]s. [min] is inclusive, [max] is exclusive.
+  // TODO(marcelgarus): Implement.
+  // Generator<core.num> numInRange(core.num min, core.num max) => null;
   Generator<core.num> get num => (random, size) {
         return random.nextBool() ? int(random, size) : double(random, size);
       };

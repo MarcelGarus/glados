@@ -1,7 +1,5 @@
 import 'dart:math';
 
-import 'structured_text.dart';
-
 /// A function with one input that's intended to be called in a test context.
 typedef Tester<T> = void Function(T input);
 
