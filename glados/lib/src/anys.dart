@@ -135,7 +135,8 @@ class ShrinkableList<T> implements Shrinkable<core.List<T>> {
   final core.int minLength;
 
   @core.override
-  get value => items.map((shrinkable) => shrinkable.value).toList();
+  core.List<T> get value =>
+      items.map((shrinkable) => shrinkable.value).toList();
 
   @core.override
   core.Iterable<Shrinkable<core.List<T>>> shrink() sync* {
@@ -180,7 +181,7 @@ class ShrinkableSet<T> implements Shrinkable<core.Set<T>> {
   final core.int minLength;
 
   @core.override
-  get value => items.map((shrinkable) => shrinkable.value).toSet();
+  core.Set<T> get value => items.map((shrinkable) => shrinkable.value).toSet();
 
   @core.override
   core.Iterable<Shrinkable<core.Set<T>>> shrink() sync* {
@@ -190,8 +191,9 @@ class ShrinkableSet<T> implements Shrinkable<core.Set<T>> {
           final newSet = core.Set.of(items)
             ..remove({item})
             ..add(shrunk);
-          if (newSet.length >= minLength)
+          if (newSet.length >= minLength) {
             yield ShrinkableSet(newSet, minLength);
+          }
         }
       }
     }

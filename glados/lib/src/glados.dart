@@ -21,7 +21,7 @@ class Explore {
         assert(initialSize > 0),
         assert(speed != null),
         assert(speed >= 0),
-        this.random = random ?? Random(42);
+        random = random ?? Random(42);
 
   /// The number of runs after which [Glados] stops trying to break the
   /// invariant.
@@ -108,8 +108,8 @@ class Explore {
 /// See the [Explore] doc comments for more information.
 class Glados<T> {
   Glados([Generator<T> generator, Explore explore])
-      : this.generator = generator ?? Any.defaultForWithBeautifulError<T>(1, 0),
-        this.explore = explore ?? Explore();
+      : generator = generator ?? Any.defaultForWithBeautifulError<T>(1, 0),
+        explore = explore ?? Explore();
 
   final Generator<T> generator;
   final Explore explore;
@@ -141,7 +141,7 @@ class Glados<T> {
 
     /// Shrinks the given value repeatedly. Returns the shrunk input.
     T shrinkPhase(Shrinkable<T> initialErrorInducingInput) {
-      Shrinkable<T> input = initialErrorInducingInput;
+      var input = initialErrorInducingInput;
 
       outer:
       while (true) {
@@ -184,11 +184,11 @@ class Glados2<First, Second> {
     Generator<First> firstGenerator,
     Generator<Second> secondGenerator,
     Explore explore,
-  ])  : this.firstGenerator =
+  ])  : firstGenerator =
             firstGenerator ?? Any.defaultForWithBeautifulError<First>(2, 0),
-        this.secondGenerator =
+        secondGenerator =
             secondGenerator ?? Any.defaultForWithBeautifulError<Second>(2, 1),
-        this.explore = explore ?? Explore();
+        explore = explore ?? Explore();
 
   final Generator<First> firstGenerator;
   final Generator<Second> secondGenerator;
@@ -211,13 +211,13 @@ class Glados3<First, Second, Third> {
     Generator<Second> secondGenerator,
     Generator<Third> thirdGenerator,
     Explore explore,
-  ])  : this.firstGenerator =
+  ])  : firstGenerator =
             firstGenerator ?? Any.defaultForWithBeautifulError<First>(3, 0),
-        this.secondGenerator =
+        secondGenerator =
             secondGenerator ?? Any.defaultForWithBeautifulError<Second>(3, 1),
-        this.thirdGenerator =
+        thirdGenerator =
             thirdGenerator ?? Any.defaultForWithBeautifulError<Third>(3, 2),
-        this.explore = explore ?? Explore();
+        explore = explore ?? Explore();
 
   final Generator<First> firstGenerator;
   final Generator<Second> secondGenerator;

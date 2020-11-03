@@ -38,7 +38,9 @@ class Any {
 }
 
 class _TypeWrapper<T> {
-  operator ==(Object other) => other.runtimeType == runtimeType;
+  @override
+  bool operator ==(Object other) => other.runtimeType == runtimeType;
+  @override
   int get hashCode => runtimeType.hashCode;
 }
 
@@ -342,7 +344,7 @@ class ShrinkableCombination<T> implements Shrinkable<T> {
   final T Function(List<dynamic> values) combiner;
 
   @override
-  get value => combiner(fields);
+  T get value => combiner(fields);
 
   @override
   Iterable<Shrinkable<T>> shrink() sync* {

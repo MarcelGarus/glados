@@ -66,8 +66,9 @@ class RichType {
 
   bool get hasGenerics => children.isNotEmpty;
   Set<String> allTypes() =>
-      [name, ...children.expand((child) => child.allTypes())].toSet();
+      {name, ...children.expand((child) => child.allTypes())};
 
+  @override
   bool operator ==(Object other) =>
       other is RichType &&
       name == other.name &&
@@ -76,10 +77,12 @@ class RichType {
         for (var i = 0; i < children.length; i++)
           children[i] == other.children[i],
       ].every((it) => it);
+  @override
   int get hashCode =>
       name.hashCode +
       children.map((child) => child.hashCode).fold(0, (a, b) => a + b);
 
+  @override
   String toString() {
     final buffer = StringBuffer(name);
     if (children.isNotEmpty) {

@@ -1,10 +1,11 @@
 class Package {
   Package(this.name, [String gladosName])
-      : this.gladosName = gladosName ?? '${name}_glados';
+      : gladosName = gladosName ?? '${name}_glados';
 
   final name;
   final gladosName;
 
+  @override
   String toString() => name;
 }
 

@@ -13,6 +13,7 @@ class NoGeneratorFound implements Exception {
   final int typeIndex;
   final Type type;
 
+  @override
   String toString() {
     final richType = RichType.fromType(type);
     return Flow([
@@ -49,7 +50,7 @@ class NoGeneratorFound implements Exception {
             ]),
         ]),
       ] else ...[
-        Paragraph("Your generator should probably look like this:"),
+        Paragraph('Your generator should probably look like this:'),
         ..._helpForSimpleType(richType.name.toString()),
       ],
       Paragraph(),
@@ -83,14 +84,14 @@ class NoGeneratorFound implements Exception {
       final package = packages.single;
       if (package == builtIn) {
         yield Paragraph.noNl("Is this the $typeName from $package? There's "
-            "already a built-in generator.");
+            'already a built-in generator.');
       } else {
         yield Paragraph.noNl('Is it from $package? The ${package.gladosName} '
             'package contains a generator for it.');
       }
     } else {
       yield Flow([
-        Paragraph.noNl("From which package is $typeName?"),
+        Paragraph.noNl('From which package is $typeName?'),
         BulletList([
           for (final package in packages)
             if (package == builtIn)
