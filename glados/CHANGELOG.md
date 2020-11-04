@@ -1,3 +1,7 @@
+## 0.3.3
+
+- Add section about how to find properties.
+
 ## 0.3.2
 
 - Fix more analysis warnings.
