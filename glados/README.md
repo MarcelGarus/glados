@@ -14,6 +14,7 @@ Here are some benefits:
 
 - [Quickstart](#quickstart)
 - [Comprehensive example](#comprehensive-example)
+- [How to find properties](#how-to-find-properties)
 - [How does it work?](#how-does-it-work)
 - [How to write generators](#how-to-write-generators)
 - [Customizing the exploration phase](#customizing-the-exploration-phase)
@@ -172,6 +173,21 @@ I'll leave implementing the function correctly to you, the reader.
 But whatever solution you come up with, it'll be correct:
 Our tests aren't merely some arbitrary examples anymore.
 Rather, they correspond to the **actual mathematical definition of max**.
+
+## How to find properties
+
+Finding properties can seem difficult at times, but you'll get better at finding them and you can start with obvious ones first.
+They don't have to be perfect – testing a few simple properties can still be better than traditional unit tests.
+
+To get your started, here are a bunch of patterns that may help you to find properties:
+
+|   |   |
+| - | - |
+| **Commutativity**: The order of the operations doesn't matter.<br /><ul><li>`list.reversed.map(...) == list.map(...).reversed`</li><li>a + b = b + a</li</ul> | ![commutativity](https://raw.githubusercontent.com/marcelgarus/glados/main/pattern-images/Commutativity.png) |
+| **Transform**: Certain operations don't affect the result of another operation.<br /><ul><li>After reversing or shuffling a list, the maximum should stay the same.</li></ul> | ![transform](https://raw.githubusercontent.com/marcelgarus/glados/main/pattern-images/Transform.png) |
+| **Inverse**: Sometimes, you can invert operations.<br /><ul><li>Reversing a list twice</li><li>Adding and subtracting the same value</li><li>Serializing and deserializing an object</li></ul> | ![inverse](https://raw.githubusercontent.com/marcelgarus/glados/main/pattern-images/Inverse.png) |
+| **Idempotence**: Certain operations don't change the value if they're applied a second time.<br /><ul><li>Sorting a list twice</li><li>Running a code formatter on a source code twice</li></ul> | ![idempotence](https://raw.githubusercontent.com/marcelgarus/glados/main/pattern-images/Idempotence.png) |
+| **Oracle**: If you have a correct implementation and want to test a more efficient one, just compare the results.<ul><li>Quicksorting a list is the same as bubblesorting it</li><li>Traditional unit tests (The correct implementation is *you* calculating the result in your head.)</li></ul> | ![oracle](https://raw.githubusercontent.com/marcelgarus/glados/main/pattern-images/Oracle.png) |
 
 ## How does it work?
 
