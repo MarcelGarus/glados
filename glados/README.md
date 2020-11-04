@@ -4,10 +4,10 @@
 
 Here are some benefits:
 
-- ⚡ **Write fewer tests.** Let Glados figure out inputs that break your invariants.
+- ⚡ **Write fewer tests.** Let Glados figure out inputs that break your properties.
 - 🌌 **Test for all possible inputs.** Well, not literally all. But a huge variety.
 - 🐜 **Get a concise error report.** Glados simplifies inputs that break your tests.
-- 🤯 **Understand the problem domain better** by thinking of invariants.
+- 🤯 **Understand the problem domain better** by thinking of properties.
 
 <details>
 <summary>Table of Contents</summary>
@@ -83,7 +83,7 @@ test('maximum of non-empty list', () {
 
 Executing `pub run test path/to/tests.dart` should show that the second test fails.
 
-In property-based testing, you look for invariants – conditions that should be true for any input.
+In property-based testing, you look for properties – conditions that should be true for any input.
 For example, if `max` produces `null`, the list should be empty:
 
 ```dart
@@ -115,8 +115,8 @@ Let's modify our `max` function to pass this test:
 int max(List<int> input) => 42;
 ```
 
-We need to add another invariant to reject this function as well.
-Arguably the most obvious invariant for `max` is the following: The maximum should be greater than or equal to all items of the list:
+We need to add another property test to reject this function as well.
+Arguably the most obvious property for `max` is the following: The maximum should be greater than or equal to all items of the list:
 
 ```dart
 Glados(any.nonEmptyList(any.int)).test('maximum is >= all items', (list) {
@@ -139,7 +139,7 @@ Failing for input: [43]
 ...
 ```
 
-Glados detected that the invariant breaks if the input list contains a `43`.
+Glados detected that the property breaks if the input list contains a `43`.
 
 Let's actually add a more reasonable implementation for `max`:
 
@@ -177,8 +177,8 @@ Rather, they correspond to the **actual mathematical definition of max**.
 
 Glados works in two phases:
 
-- 🌍 **The exploration phase**: Glados generates increasingly complex, random inputs until one breaks the invariant or the maximum number of runs is reached.
-- 🐜 **The shrinking phase**: This phase only happens if Glados found an input that breaks the invariant. In this case, the input is gradually simplified and the smallest input that's still breaking the invariant is returned.
+- 🌍 **The exploration phase**: Glados generates increasingly complex, random inputs until one breaks the property or the maximum number of runs is reached.
+- 🐜 **The shrinking phase**: This phase only happens if Glados found an input that breaks the property. In this case, the input is gradually simplified and the smallest input that's still breaking the property is returned.
 
 Generators are responsible for generating code. `Generator<T>` is simply a function that takes a `random` and `size` and produces a `Shrinkable<T>`.
 The `random` parameter should be used as the only source of randomness to guarantee reproducibility when running tests multiple times.
