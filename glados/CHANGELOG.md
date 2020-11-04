@@ -1,3 +1,8 @@
+## 0.3.4
+
+- Make pattern images more readable.
+- Fix minor errors in readme.
+
 ## 0.3.3
 
 - Add section about how to find properties.
