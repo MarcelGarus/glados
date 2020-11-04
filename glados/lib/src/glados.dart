@@ -116,20 +116,20 @@ class Glados<T> {
 
   /// Executes the given body with a bunch of parameters, trying to break it.
   @isTest
-  void test(String name, Tester<T> body) {
+  void test(String description, Tester<T> body) {
     final stats = Statistics();
 
     /// Explores the input space for inputs that break the invariant. This works
     /// by gradually increasing the size. Returns the first value where the
     /// invariance is broken or null if no value was found.
-    Shrinkable<T> explorePhase() {
+    Future<Shrinkable<T>> explorePhase() async {
       var count = 0;
       var size = explore.initialSize;
 
       while (count < explore.numRuns) {
         stats.exploreCounter++;
         final input = generator(explore.random, size.ceil());
-        if (!succeeds(body, input.value)) {
+        if (!await succeeds(body, input.value)) {
           return input;
         }
 
@@ -140,14 +140,14 @@ class Glados<T> {
     }
 
     /// Shrinks the given value repeatedly. Returns the shrunk input.
-    T shrinkPhase(Shrinkable<T> initialErrorInducingInput) {
+    Future<T> shrinkPhase(Shrinkable<T> initialErrorInducingInput) async {
       var input = initialErrorInducingInput;
 
       outer:
       while (true) {
         for (final shrunkInput in input.shrink()) {
           stats.shrinkCounter++;
-          if (!succeeds(body, shrunkInput.value)) {
+          if (!await succeeds(body, shrunkInput.value)) {
             input = shrunkInput;
             continue outer;
           }
@@ -158,13 +158,13 @@ class Glados<T> {
     }
 
     test_package.test(
-      '$name (testing ${explore.numRuns} '
+      '$description (testing ${explore.numRuns} '
       '${explore.numRuns == 1 ? 'input' : 'inputs'})',
-      () {
-        final errorInducingInput = explorePhase();
+      () async {
+        final errorInducingInput = await explorePhase();
         if (errorInducingInput == null) return;
 
-        final shrunkInput = shrinkPhase(errorInducingInput);
+        final shrunkInput = await shrinkPhase(errorInducingInput);
         print('Tested ${stats.exploreCounter} '
             '${stats.exploreCounter == 1 ? 'input' : 'inputs'}, shrunk '
             '${stats.shrinkCounter} ${stats.shrinkCounter == 1 ? 'time' : 'times'}.'

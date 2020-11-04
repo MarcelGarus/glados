@@ -1,13 +1,14 @@
+import 'dart:async';
 import 'dart:math';
 
 /// A function with one input that's intended to be called in a test context.
-typedef Tester<T> = void Function(T input);
+typedef Tester<T> = FutureOr<void> Function(T input);
 
 /// A function with two inputs that's intended to be called in a test context.
-typedef Tester2<A, B> = void Function(A firstInput, B secondInput);
+typedef Tester2<A, B> = FutureOr<void> Function(A firstInput, B secondInput);
 
 /// A function with three inputs that's intended to be called in a test context.
-typedef Tester3<A, B, C> = void Function(
+typedef Tester3<A, B, C> = FutureOr<void> Function(
     A firstInput, B secondInput, C thirdInput);
 
 /// A simple class storing statistics.
@@ -26,9 +27,9 @@ extension RandomUtils on Random {
 
 /// Runs the [tester] with the [input]. Catches thrown errors and instead
 /// returns a [bool] indicating whether the tester ran through successfully.
-bool succeeds<T>(Tester<T> tester, T input) {
+Future<bool> succeeds<T>(Tester<T> tester, T input) async {
   try {
-    tester(input);
+    await tester(input);
     return true;
   } catch (e) {
     return false;
