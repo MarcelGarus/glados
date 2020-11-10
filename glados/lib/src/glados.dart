@@ -24,7 +24,7 @@ class ExploreConfig {
         random = random ?? Random(42);
 
   /// The number of runs after which [Glados] stops trying to break the
-  /// invariant.
+  /// property test.
   final int numRuns;
 
   /// The initial size.
@@ -119,9 +119,9 @@ class Glados<T> {
   void test(String description, Tester<T> body) {
     final stats = Statistics();
 
-    /// Explores the input space for inputs that break the invariant. This works
+    /// Explores the input space for inputs that break the property. This works
     /// by gradually increasing the size. Returns the first value where the
-    /// invariance is broken or null if no value was found.
+    /// property is broken or null if no value was found.
     Future<Shrinkable<T>> explorePhase() async {
       var count = 0;
       var size = explore.initialSize;
@@ -169,9 +169,9 @@ class Glados<T> {
             '${stats.exploreCounter == 1 ? 'input' : 'inputs'}, shrunk '
             '${stats.shrinkCounter} ${stats.shrinkCounter == 1 ? 'time' : 'times'}.'
             '\nFailing for input: $shrunkInput');
-        body(shrunkInput); // This should fail the test again.
+        final output = body(shrunkInput); // This should fail the test again.
 
-        throw InvarianceNotDeterministic(shrunkInput);
+        throw PropertyTestNotDeterministic(shrunkInput, output);
       },
     );
   }
