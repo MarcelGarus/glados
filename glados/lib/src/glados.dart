@@ -9,8 +9,8 @@ import 'generator.dart';
 import 'utils.dart';
 
 /// Configuration for several parameters used during the exploration phase.
-class Explore {
-  Explore({
+class ExploreConfig {
+  ExploreConfig({
     this.numRuns = 100,
     this.initialSize = 10,
     this.speed = 1,
@@ -104,15 +104,15 @@ class Explore {
 ///
 /// # Exploration
 ///
-/// To customize the exploration phase, provide an [Explore] configuration.
-/// See the [Explore] doc comments for more information.
+/// To customize the exploration phase, provide an [ExploreConfig] configuration.
+/// See the [ExploreConfig] doc comments for more information.
 class Glados<T> {
-  Glados([Generator<T> generator, Explore explore])
+  Glados([Generator<T> generator, ExploreConfig explore])
       : generator = generator ?? Any.defaultForWithBeautifulError<T>(1, 0),
-        explore = explore ?? Explore();
+        explore = explore ?? ExploreConfig();
 
   final Generator<T> generator;
-  final Explore explore;
+  final ExploreConfig explore;
 
   /// Executes the given body with a bunch of parameters, trying to break it.
   @isTest
@@ -183,16 +183,16 @@ class Glados2<First, Second> {
   Glados2([
     Generator<First> firstGenerator,
     Generator<Second> secondGenerator,
-    Explore explore,
+    ExploreConfig explore,
   ])  : firstGenerator =
             firstGenerator ?? Any.defaultForWithBeautifulError<First>(2, 0),
         secondGenerator =
             secondGenerator ?? Any.defaultForWithBeautifulError<Second>(2, 1),
-        explore = explore ?? Explore();
+        explore = explore ?? ExploreConfig();
 
   final Generator<First> firstGenerator;
   final Generator<Second> secondGenerator;
-  final Explore explore;
+  final ExploreConfig explore;
 
   void test(String name, Tester2<First, Second> body) {
     Glados(
@@ -210,19 +210,19 @@ class Glados3<First, Second, Third> {
     Generator<First> firstGenerator,
     Generator<Second> secondGenerator,
     Generator<Third> thirdGenerator,
-    Explore explore,
+    ExploreConfig explore,
   ])  : firstGenerator =
             firstGenerator ?? Any.defaultForWithBeautifulError<First>(3, 0),
         secondGenerator =
             secondGenerator ?? Any.defaultForWithBeautifulError<Second>(3, 1),
         thirdGenerator =
             thirdGenerator ?? Any.defaultForWithBeautifulError<Third>(3, 2),
-        explore = explore ?? Explore();
+        explore = explore ?? ExploreConfig();
 
   final Generator<First> firstGenerator;
   final Generator<Second> secondGenerator;
   final Generator<Third> thirdGenerator;
-  final Explore explore;
+  final ExploreConfig explore;
 
   void test(String name, Tester3<First, Second, Third> body) {
     Glados(any.combine3(
