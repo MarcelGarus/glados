@@ -1,5 +1,6 @@
 import 'package:glados/src/packages.dart';
 
+import 'rich_type.dart';
 import 'structured_text.dart';
 import 'utils.dart';
 
