@@ -116,7 +116,16 @@ class Glados<T> {
 
   /// Executes the given body with a bunch of parameters, trying to break it.
   @isTest
-  void test(String description, Tester<T> body) {
+  void test(
+    String description,
+    Tester<T> body, {
+    String testOn,
+    test_package.Timeout timeout,
+    dynamic skip,
+    dynamic tags,
+    Map<String, dynamic> onPlatform,
+    int retry,
+  }) {
     final stats = Statistics();
 
     /// Explores the input space for inputs that break the property. This works
@@ -173,6 +182,43 @@ class Glados<T> {
 
         throw PropertyTestNotDeterministic(shrunkInput, output);
       },
+      testOn: testOn,
+      timeout: timeout,
+      skip: skip,
+      tags: tags,
+      onPlatform: onPlatform,
+      retry: retry,
+    );
+  }
+
+  @isTest
+  void testWithRandom(
+    String description,
+    TesterWithRandom<T> body, {
+    String testOn,
+    test_package.Timeout timeout,
+    dynamic skip,
+    dynamic tags,
+    Map<String, dynamic> onPlatform,
+    int retry,
+  }) {
+    // How many random values the test needs shouldn't change what other inputs
+    // are chosen. Otherwise, if a test fails, you edit the content and then the
+    // test succeeds, you're not sure what made the test succeed:
+    //
+    // - Maybe you fixed the root problem.
+    // - Or you changed some calls to the random instance, causing the faulty
+    //   input to never be generated in the first place.
+    final random = explore.random.nextRandom();
+    test(
+      description,
+      (a) => body(a, random.nextRandom()),
+      testOn: testOn,
+      timeout: timeout,
+      skip: skip,
+      tags: tags,
+      onPlatform: onPlatform,
+      retry: retry,
     );
   }
 }
@@ -194,12 +240,53 @@ class Glados2<First, Second> {
   final Generator<Second> secondGenerator;
   final ExploreConfig explore;
 
-  void test(String name, Tester2<First, Second> body) {
+  @isTest
+  void test(
+    String description,
+    Tester2<First, Second> body, {
+    String testOn,
+    test_package.Timeout timeout,
+    dynamic skip,
+    dynamic tags,
+    Map<String, dynamic> onPlatform,
+    int retry,
+  }) {
     Glados(
       any.combine2(firstGenerator, secondGenerator, (a, b) => [a, b]),
-    ).test(name, (input) {
-      body(input[0] as First, input[1] as Second);
-    });
+    ).test(
+      description,
+      (input) => body(input[0] as First, input[1] as Second),
+      testOn: testOn,
+      timeout: timeout,
+      skip: skip,
+      tags: tags,
+      onPlatform: onPlatform,
+      retry: retry,
+    );
+  }
+
+  @isTest
+  void testWithRandom(
+    String description,
+    Tester2WithRandom<First, Second> body, {
+    String testOn,
+    test_package.Timeout timeout,
+    dynamic skip,
+    dynamic tags,
+    Map<String, dynamic> onPlatform,
+    int retry,
+  }) {
+    final random = explore.random.nextRandom();
+    test(
+      description,
+      (a, b) => body(a, b, random.nextRandom()),
+      testOn: testOn,
+      timeout: timeout,
+      skip: skip,
+      tags: tags,
+      onPlatform: onPlatform,
+      retry: retry,
+    );
   }
 }
 
@@ -224,14 +311,55 @@ class Glados3<First, Second, Third> {
   final Generator<Third> thirdGenerator;
   final ExploreConfig explore;
 
-  void test(String name, Tester3<First, Second, Third> body) {
+  @isTest
+  void test(
+    String description,
+    Tester3<First, Second, Third> body, {
+    String testOn,
+    test_package.Timeout timeout,
+    dynamic skip,
+    dynamic tags,
+    Map<String, dynamic> onPlatform,
+    int retry,
+  }) {
     Glados(any.combine3(
       firstGenerator,
       secondGenerator,
       thirdGenerator,
       (a, b, c) => [a, b, c],
-    )).test(name, (input) {
-      body(input[0] as First, input[1] as Second, input[2] as Third);
-    });
+    )).test(
+      description,
+      (input) => body(input[0] as First, input[1] as Second, input[2] as Third),
+      testOn: testOn,
+      timeout: timeout,
+      skip: skip,
+      tags: tags,
+      onPlatform: onPlatform,
+      retry: retry,
+    );
+  }
+
+  @isTest
+  void testWithRandom(
+    String description,
+    Tester3WithRandom<First, Second, Third> body, {
+    String testOn,
+    test_package.Timeout timeout,
+    dynamic skip,
+    dynamic tags,
+    Map<String, dynamic> onPlatform,
+    int retry,
+  }) {
+    final random = explore.random.nextRandom();
+    test(
+      description,
+      (a, b, c) => body(a, b, c, random.nextRandom()),
+      testOn: testOn,
+      timeout: timeout,
+      skip: skip,
+      tags: tags,
+      onPlatform: onPlatform,
+      retry: retry,
+    );
   }
 }
