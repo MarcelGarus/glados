@@ -1,5 +1,6 @@
 import 'package:glados/glados.dart';
 import 'package:test/test.dart';
+import 'package:tuple/tuple.dart';
 
 // part 'main.g.dart';
 
@@ -17,20 +18,27 @@ int max(List<int> input) {
 
 void main() {
   group('maximum', () {
-    Glados<List<int>>().test('is only null if the list is empty', (list) {
-      if (max(list) == null) {
-        expect(list, isEmpty);
-      }
+    Glados<List<int>>(null, ExploreConfig(initialSize: 1, random: Random(3)))
+        .test('...', (list) {
+      print('Testing for list $list.');
+      assert(list.where((it) => it < 0).length >
+          list.where((it) => it >= 0).length);
     });
-    Glados(any.nonEmptyList(any.int)).test('is in the list', (list) {
-      expect(list, contains(max(list)));
-    });
-    Glados<List<List<int>>>().test('is >= all items', (list) {
-      // var maximum = max(list);
-      // for (var item in list) {
-      //   expect(maximum, greaterThanOrEqualTo(item));
-      // }
-    });
+
+    // Glados<List<int>>().test('is only null if the list is empty', (list) {
+    //   if (max(list) == null) {
+    //     expect(list, isEmpty);
+    //   }
+    // });
+    // Glados(any.nonEmptyList(any.int)).test('is in the list', (list) {
+    //   expect(list, contains(max(list)));
+    // });
+    // Glados2<int, Tuple2<int, User>>().test('is >= all items', (a, b) {
+    //   // var maximum = max(list);
+    //   // for (var item in list) {
+    //   //   expect(maximum, greaterThanOrEqualTo(item));
+    //   // }
+    // });
   });
 }
 
