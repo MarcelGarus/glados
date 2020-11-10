@@ -20,8 +20,8 @@ extension IntAnys on Any {
         generate: (random, size) =>
             random.nextIntInRange(min ?? -size, max ?? size),
         shrink: (input) sync* {
-          if (input > 0 && input > min ?? 0) yield input - 1;
-          if (input < 0 && input < max ?? 0) yield input + 1;
+          if (input > 0 && input > (min ?? 0)) yield input - 1;
+          if (input < 0 && input < (max ?? 0)) yield input + 1;
         },
       );
   Generator<core.int> get int => intInRange(null, null);
@@ -67,7 +67,7 @@ extension DoubleAnys on Any {
 }
 
 extension NumAnys on Any {
-  // A generator for [double]s. [min] is inclusive, [max] is exclusive.
+  // A generator for [num]s. [min] is inclusive, [max] is exclusive.
   // TODO(marcelgarus): Implement.
   // Generator<core.num> numInRange(core.num min, core.num max) => null;
   Generator<core.num> get num => (random, size) {
@@ -112,7 +112,7 @@ extension ListAnys on Any {
       core.int min, core.int max, Generator<T> itemGenerator) {
     assert(min == null || min >= 0);
     return (random, size) {
-      final length = random.nextIntInRange(min, max);
+      final length = random.nextIntInRange(min ?? 0, max ?? size);
       return ShrinkableList(<Shrinkable<T>>[
         for (var i = 0; i < length; i++) itemGenerator(random, size),
       ], min);
