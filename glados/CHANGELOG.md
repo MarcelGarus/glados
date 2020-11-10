@@ -1,3 +1,13 @@
+## 0.4.0
+
+- Support `async` tests.
+- `Explore` is now `ExploreConfig`.
+- You can now use all parameters that you would pass to the normal `test` function (to set timeouts, configure which platform the test runs on etc.). Glados simply forwards those parameters.
+- Your tests can depend on a `Random`! Just use `testWithRandom`
+- Rename *invariant* to *property* to align with the terminologoy usually used in property-based testing frameworks.
+- Make `PropertyTestNotDeterministic` error more helpful.
+- Glados itself is now (partially) tested.
+
 ## 0.3.4
 
 - Make pattern images more readable.
