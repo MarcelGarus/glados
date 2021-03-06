@@ -16,7 +16,7 @@ void main() {
         final max = min + length;
         final value = random.nextIntInRange(min, max);
         expect(value, greaterThanOrEqualTo(min));
-        expect(value, lessThan(min));
+        expect(value, lessThan(max));
       },
     );
   });
