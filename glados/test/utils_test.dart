@@ -4,7 +4,7 @@ import 'package:test/test.dart';
 
 void main() {
   group('RandomUtils', () {
-    Glados<List<int>>().testWithRandom(
+    Glados(any.nonEmptyList(any.int)).testWithRandom(
       'choose returns value from list',
       (list, random) {
         expect(list, contains(random.choose(list)));

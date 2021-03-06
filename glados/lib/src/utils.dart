@@ -23,7 +23,7 @@ class Statistics {
 }
 
 extension RandomUtils on Random {
-  T choose<T>(List<T> list) => list[nextInt(nextInt(list.length))];
+  T choose<T>(List<T> list) => list[nextInt(list.length)];
   int nextIntInRange(int min, int max) {
     assert(min < max);
     return nextInt(max - min) + min;
