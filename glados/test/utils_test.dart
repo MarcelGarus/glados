@@ -40,6 +40,6 @@ void main() {
   });
   group('JoinableStrings', () {
     test('joinLines', () => expect(['a', 'b'].joinLines(), 'a\nb'));
-    test('joinParts', () => expect(['a', 'b'].joinLines(), 'a\n\nb'));
+    test('joinParts', () => expect(['a', 'b'].joinParts(), 'a\n\nb'));
   });
 }
