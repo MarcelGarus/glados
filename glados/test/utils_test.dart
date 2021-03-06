@@ -21,12 +21,12 @@ void main() {
     );
   });
   group('succeeds', () {
-    test('not throwing', () {
-      expect(succeeds((_) {}, true), equals(true));
+    test('not throwing', () async {
+      expect(await succeeds((_) {}, true), equals(true));
     });
-    test('throwing', () {
+    test('throwing', () async {
       expect(
-        succeeds((_) {
+        await succeeds((_) {
           throw 'blub';
         }, true),
         equals(false),
