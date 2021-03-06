@@ -107,11 +107,11 @@ extension AnyUtils on Any {
 extension CombinableAny on Any {
   /// Combines n values. Is not typesafe, so it's private.
   Generator<T> _combineN<T>(
-    List<Generator<dynamic>> generators,
-    T Function(List<dynamic> values) combiner,
+    List<Generator<Object>> generators,
+    T Function(List<Object> values) combiner,
   ) {
     return (random, size) {
-      return ShrinkableCombination(<Shrinkable<T>>[
+      return ShrinkableCombination(<Shrinkable<Object>>[
         for (final generator in generators) generator(random, size),
       ], combiner);
     };
@@ -340,11 +340,11 @@ extension CombinableAny on Any {
 class ShrinkableCombination<T> implements Shrinkable<T> {
   ShrinkableCombination(this.fields, this.combiner);
 
-  final List<Shrinkable<T>> fields;
-  final T Function(List<dynamic> values) combiner;
+  final List<Shrinkable<Object>> fields;
+  final T Function(List<Object> values) combiner;
 
   @override
-  T get value => combiner(fields);
+  T get value => combiner(fields.map((shrinkable) => shrinkable.value).toList());
 
   @override
   Iterable<Shrinkable<T>> shrink() sync* {
