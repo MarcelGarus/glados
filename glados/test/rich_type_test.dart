@@ -64,8 +64,8 @@ void main() {
     );
   });
   test('invalid', () {
-    expect(RichType.fromString('Bar<'), equals(null));
-    expect(RichType.fromString('Bar<Foo'), equals(null));
-    expect(RichType.fromString('Bar<Foo>>'), equals(null));
+    expect(() => RichType.fromString('Bar<'), throwsFormatException);
+    expect(() => RichType.fromString('Bar<Foo'), throwsFormatException);
+    expect(() => RichType.fromString('Bar<Foo>>'), throwsFormatException);
   });
 }
