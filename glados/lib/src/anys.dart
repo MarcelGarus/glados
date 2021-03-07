@@ -1,4 +1,5 @@
 import 'dart:core' as core;
+import 'dart:math' as math;
 
 import 'package:characters/characters.dart';
 
@@ -16,7 +17,7 @@ extension BoolAny on Any {
 
 extension IntAnys on Any {
   /// A generator for [int]s. [min] is inclusive, [max] is exclusive.
-  Generator<core.int> intInRange(core.int min, core.int max) => simple(
+  Generator<core.int> intInRange(core.int? min, core.int? max) => simple(
         generate: (random, size) =>
             random.nextIntInRange(min ?? -size, max ?? size),
         shrink: (input) sync* {
@@ -41,7 +42,7 @@ extension IntAnys on Any {
 
 extension DoubleAnys on Any {
   /// A generator for [double]s. [min] is inclusive, [max] is exclusive.
-  Generator<core.double> doubleInRange(core.double min, core.double max) =>
+  Generator<core.double> doubleInRange(core.double? min, core.double? max) =>
       simple(
         generate: (random, size) {
           final actualMin = min ?? -size.toDouble();
@@ -51,8 +52,8 @@ extension DoubleAnys on Any {
         shrink: (input) sync* {
           // Turn 200 -> 199 -> 198 ... and 0.9 -> 0.8 -> 0.7 -> ...
           for (var i = 1; i > 0.001; i ~/= 10) {
-            if (input > i && input > min ?? 0) yield input - i;
-            if (input < -i && input < max ?? 0) yield input + i;
+            if (input > i && input > (min ?? 0)) yield input - i;
+            if (input < -i && input < (max ?? 0)) yield input + i;
           }
           // Round to some digets.
           for (var i = 10; i < 100000; i *= 10) {
@@ -77,7 +78,7 @@ extension NumAnys on Any {
 
 extension BigIntAnys on Any {
   /// A generator for [double]s. [min] is inclusive, [max] is exclusive.
-  Generator<core.BigInt> bigIntInRange(core.BigInt min, core.BigInt max) =>
+  Generator<core.BigInt> bigIntInRange(core.BigInt? min, core.BigInt? max) =>
       simple(
         generate: (random, size) {
           final actualMin = min ?? core.BigInt.from(-size);
@@ -92,7 +93,7 @@ extension BigIntAnys on Any {
               bigInt += core.BigInt.one;
             }
           }
-          return bigInt - min;
+          return bigInt - actualMin;
         },
         shrink: (input) sync* {
           if (input > core.BigInt.zero) {
@@ -109,7 +110,7 @@ extension ListAnys on Any {
   /// A generator for [List]s with a length in the given bounds. [min] is
   /// inclusive, [max] is exclusive.
   Generator<core.List<T>> listWithLengthInRange<T>(
-      core.int min, core.int max, Generator<T> itemGenerator) {
+      core.int? min, core.int? max, Generator<T> itemGenerator) {
     assert(min == null || min >= 0);
     return (random, size) {
       final length = random.nextIntInRange(min ?? 0, max ?? size);
@@ -129,7 +130,7 @@ extension ListAnys on Any {
 }
 
 class ShrinkableList<T> implements Shrinkable<core.List<T>> {
-  ShrinkableList(this.items, this.minLength);
+  ShrinkableList(this.items, core.int? minLength) : minLength = minLength ?? 0;
 
   final core.List<Shrinkable<T>> items;
   final core.int minLength;
@@ -155,10 +156,10 @@ class ShrinkableList<T> implements Shrinkable<core.List<T>> {
 
 extension SetAyns on Any {
   Generator<core.Set<T>> setWithLengthInRange<T>(
-      core.int min, core.int max, Generator<T> itemGenerator) {
-    assert(min == null || min >= 0);
+      core.int min, core.int? max, Generator<T> itemGenerator) {
+    assert(min >= 0);
     return (random, size) {
-      final length = random.nextIntInRange(min, max);
+      final length = random.nextIntInRange(min, math.max(max ?? size, min + 1));
       return ShrinkableSet(<Shrinkable<T>>{
         for (var i = 0; i < length; i++) itemGenerator(random, size),
       }, min);
@@ -222,7 +223,7 @@ extension MapAnys on Any {
   Generator<core.MapEntry<K, V>> mapEntry<K, V>(
           Generator<K> keyArbitrary, Generator<V> valueArbitrary) =>
       combine2(keyArbitrary, valueArbitrary,
-          (key, value) => core.MapEntry(key, value));
+          (K key, V value) => core.MapEntry(key, value));
   Generator<core.Map<K, V>> map<K, V>(
           Generator<K> keyGenerator, Generator<V> valueGenerator) =>
       list(mapEntry(keyGenerator, valueGenerator))

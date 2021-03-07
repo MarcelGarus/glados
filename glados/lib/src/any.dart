@@ -26,7 +26,7 @@ class Any {
   static void setDefault<T>(Generator<T> generator) =>
       _defaults[_TypeWrapper<T>()] = generator;
   static Generator<T> defaultFor<T>() =>
-      _defaults[_TypeWrapper<T>()] ?? (throw InternalNoGeneratorFound());
+      (_defaults[_TypeWrapper<T>()] as Generator<T>?) ?? (throw InternalNoGeneratorFound());
   static Generator<T> defaultForWithBeautifulError<T>(
       int numGladosArgs, int typeIndex) {
     try {
@@ -49,14 +49,14 @@ extension AnyUtils on Any {
   /// Creates a new, simple [Generator] that produces values and knows how to
   /// simplify them.
   Generator<T> simple<T>({
-    @required T Function(Random random, int size) generate,
-    @required Iterable<T> Function(T input) shrink,
+    required T Function(Random random, int size) generate,
+    required Iterable<T> Function(T input) shrink,
   }) {
     // Map both given functions to the semantics of generators: Instead of
     // having two top-level functions, we have one function that generates
     // `ShrinkableValue`s that each know how the shrink themselves.
 
-    Shrinkable<T> Function(T input) generateShrinkable;
+    late Shrinkable<T> Function(T) generateShrinkable;
     generateShrinkable = (T value) {
       return Shrinkable(value, () sync* {
         for (final value in shrink(value)) {
@@ -107,11 +107,11 @@ extension AnyUtils on Any {
 extension CombinableAny on Any {
   /// Combines n values. Is not typesafe, so it's private.
   Generator<T> _combineN<T>(
-    List<Generator<Object>> generators,
-    T Function(List<Object> values) combiner,
+    List<Generator<dynamic>> generators,
+    T Function(List<dynamic> values) combiner,
   ) {
     return (random, size) {
-      return ShrinkableCombination(<Shrinkable<Object>>[
+      return ShrinkableCombination(<Shrinkable<dynamic>>[
         for (final generator in generators) generator(random, size),
       ], combiner);
     };
@@ -340,8 +340,8 @@ extension CombinableAny on Any {
 class ShrinkableCombination<T> implements Shrinkable<T> {
   ShrinkableCombination(this.fields, this.combiner);
 
-  final List<Shrinkable<Object>> fields;
-  final T Function(List<Object> values) combiner;
+  final List<Shrinkable<dynamic>> fields;
+  final T Function(List<dynamic> values) combiner;
 
   @override
   T get value => combiner(fields.map((shrinkable) => shrinkable.value).toList());
