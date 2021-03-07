@@ -30,9 +30,9 @@ class RichType {
           children[i] == other.children[i],
       ].every((it) => it);
   @override
-  int get hashCode =>
-      name.hashCode +
-      children.map((child) => child.hashCode).fold(0, (a, b) => a + b);
+  int get hashCode => children
+      .map((child) => child.hashCode)
+      .fold(name.hashCode, (a, b) => a ^ b);
 
   @override
   String toString() {
