@@ -111,12 +111,13 @@ extension ListAnys on Any {
   /// inclusive, [max] is exclusive.
   Generator<core.List<T>> listWithLengthInRange<T>(
       core.int? min, core.int? max, Generator<T> itemGenerator) {
-    assert(min == null || min >= 0);
+    final actualMin = min ?? 0;
+    assert(actualMin >= 0);
     return (random, size) {
-      final length = random.nextIntInRange(min ?? 0, max ?? size);
+      final length = random.nextIntInRange(actualMin, math.max(max ?? size, actualMin + 1));
       return ShrinkableList(<Shrinkable<T>>[
         for (var i = 0; i < length; i++) itemGenerator(random, size),
-      ], min);
+      ], actualMin);
     };
   }
 
@@ -156,13 +157,14 @@ class ShrinkableList<T> implements Shrinkable<core.List<T>> {
 
 extension SetAyns on Any {
   Generator<core.Set<T>> setWithLengthInRange<T>(
-      core.int min, core.int? max, Generator<T> itemGenerator) {
-    assert(min >= 0);
+      core.int? min, core.int? max, Generator<T> itemGenerator) {
+    final actualMin = min ?? 0;
+    assert(actualMin >= 0);
     return (random, size) {
-      final length = random.nextIntInRange(min, math.max(max ?? size, min + 1));
+      final length = random.nextIntInRange(actualMin, math.max(max ?? size, actualMin + 1));
       return ShrinkableSet(<Shrinkable<T>>{
         for (var i = 0; i < length; i++) itemGenerator(random, size),
-      }, min);
+      }, actualMin);
     };
   }
 
@@ -176,7 +178,7 @@ extension SetAyns on Any {
 }
 
 class ShrinkableSet<T> implements Shrinkable<core.Set<T>> {
-  ShrinkableSet(this.items, this.minLength);
+  ShrinkableSet(this.items, core.int? minLength) : minLength = minLength ?? 0;
 
   final core.Set<Shrinkable<T>> items;
   final core.int minLength;
