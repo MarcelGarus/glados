@@ -14,7 +14,7 @@ class ExploreConfig {
     this.numRuns = 100,
     this.initialSize = 10,
     this.speed = 1,
-    Random random,
+    Random? random,
   })  : assert(numRuns != null),
         assert(numRuns > 0),
         assert(initialSize != null),
@@ -107,7 +107,7 @@ class ExploreConfig {
 /// To customize the exploration phase, provide an [ExploreConfig] configuration.
 /// See the [ExploreConfig] doc comments for more information.
 class Glados<T> {
-  Glados([Generator<T> generator, ExploreConfig explore])
+  Glados([Generator<T>? generator, ExploreConfig? explore])
       : generator = generator ?? Any.defaultForWithBeautifulError<T>(1, 0),
         explore = explore ?? ExploreConfig();
 
@@ -119,19 +119,19 @@ class Glados<T> {
   void test(
     String description,
     Tester<T> body, {
-    String testOn,
-    test_package.Timeout timeout,
+    String? testOn,
+    test_package.Timeout? timeout,
     dynamic skip,
     dynamic tags,
-    Map<String, dynamic> onPlatform,
-    int retry,
+    Map<String, dynamic>? onPlatform,
+    int? retry,
   }) {
     final stats = Statistics();
 
     /// Explores the input space for inputs that break the property. This works
     /// by gradually increasing the size. Returns the first value where the
     /// property is broken or null if no value was found.
-    Future<Shrinkable<T>> explorePhase() async {
+    Future<Shrinkable<T>?> explorePhase() async {
       var count = 0;
       var size = explore.initialSize;
 
@@ -195,12 +195,12 @@ class Glados<T> {
   void testWithRandom(
     String description,
     TesterWithRandom<T> body, {
-    String testOn,
-    test_package.Timeout timeout,
+    String? testOn,
+    test_package.Timeout? timeout,
     dynamic skip,
     dynamic tags,
-    Map<String, dynamic> onPlatform,
-    int retry,
+    Map<String, dynamic>? onPlatform,
+    int? retry,
   }) {
     // How many random values the test needs shouldn't change what other inputs
     // are chosen. Otherwise, if a test fails, you edit the content and then the
@@ -227,9 +227,9 @@ class Glados<T> {
 /// See [Glados] for more information about the arguments.
 class Glados2<First, Second> {
   Glados2([
-    Generator<First> firstGenerator,
-    Generator<Second> secondGenerator,
-    ExploreConfig explore,
+    Generator<First>? firstGenerator,
+    Generator<Second>? secondGenerator,
+    ExploreConfig? explore,
   ])  : firstGenerator =
             firstGenerator ?? Any.defaultForWithBeautifulError<First>(2, 0),
         secondGenerator =
@@ -244,15 +244,15 @@ class Glados2<First, Second> {
   void test(
     String description,
     Tester2<First, Second> body, {
-    String testOn,
-    test_package.Timeout timeout,
+    String? testOn,
+    test_package.Timeout? timeout,
     dynamic skip,
     dynamic tags,
-    Map<String, dynamic> onPlatform,
-    int retry,
+    Map<String, dynamic>? onPlatform,
+    int? retry,
   }) {
     Glados(
-      any.combine2(firstGenerator, secondGenerator, (a, b) => [a, b]),
+      any.combine2(firstGenerator, secondGenerator, (First a, Second b) => [a, b]),
     ).test(
       description,
       (input) => body(input[0] as First, input[1] as Second),
@@ -269,12 +269,12 @@ class Glados2<First, Second> {
   void testWithRandom(
     String description,
     Tester2WithRandom<First, Second> body, {
-    String testOn,
-    test_package.Timeout timeout,
+    String? testOn,
+    test_package.Timeout? timeout,
     dynamic skip,
     dynamic tags,
-    Map<String, dynamic> onPlatform,
-    int retry,
+    Map<String, dynamic>? onPlatform,
+    int? retry,
   }) {
     final random = explore.random.nextRandom();
     test(
@@ -294,10 +294,10 @@ class Glados2<First, Second> {
 /// See [Glados] for more information about the arguments.
 class Glados3<First, Second, Third> {
   Glados3([
-    Generator<First> firstGenerator,
-    Generator<Second> secondGenerator,
-    Generator<Third> thirdGenerator,
-    ExploreConfig explore,
+    Generator<First>? firstGenerator,
+    Generator<Second>? secondGenerator,
+    Generator<Third>? thirdGenerator,
+    ExploreConfig? explore,
   ])  : firstGenerator =
             firstGenerator ?? Any.defaultForWithBeautifulError<First>(3, 0),
         secondGenerator =
@@ -315,18 +315,18 @@ class Glados3<First, Second, Third> {
   void test(
     String description,
     Tester3<First, Second, Third> body, {
-    String testOn,
-    test_package.Timeout timeout,
+    String? testOn,
+    test_package.Timeout? timeout,
     dynamic skip,
     dynamic tags,
-    Map<String, dynamic> onPlatform,
-    int retry,
+    Map<String, dynamic>? onPlatform,
+    int? retry,
   }) {
     Glados(any.combine3(
       firstGenerator,
       secondGenerator,
       thirdGenerator,
-      (a, b, c) => [a, b, c],
+      (First a, Second b, Third c) => [a, b, c],
     )).test(
       description,
       (input) => body(input[0] as First, input[1] as Second, input[2] as Third),
@@ -343,12 +343,12 @@ class Glados3<First, Second, Third> {
   void testWithRandom(
     String description,
     Tester3WithRandom<First, Second, Third> body, {
-    String testOn,
-    test_package.Timeout timeout,
+    String? testOn,
+    test_package.Timeout? timeout,
     dynamic skip,
     dynamic tags,
-    Map<String, dynamic> onPlatform,
-    int retry,
+    Map<String, dynamic>? onPlatform,
+    int? retry,
   }) {
     final random = explore.random.nextRandom();
     test(

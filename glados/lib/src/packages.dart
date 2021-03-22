@@ -1,5 +1,5 @@
 class Package {
-  Package(this.name, [String gladosName])
+  Package(this.name, [String? gladosName])
       : gladosName = gladosName ?? '${name}_glados';
 
   final name;

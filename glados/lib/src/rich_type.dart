@@ -7,11 +7,14 @@ class RichType {
   factory RichType.fromString(String string) {
     final parser = _TypeParser(string.replaceAll(' ', ''));
     final type = parser.parse();
-    return parser.cursor == parser.string.length ? type : null;
+    if (parser.cursor != parser.string.length) {
+      throw FormatException(
+          "Extra data after type name in '$string' at ${parser.cursor}");
+    }
+    return type;
   }
   RichType(this.name, [this.children = const []])
-      : assert(name != null),
-        assert(name.isNotEmpty);
+      : assert(name.isNotEmpty);
 
   final String name;
   final List<RichType> children;
@@ -30,9 +33,9 @@ class RichType {
           children[i] == other.children[i],
       ].every((it) => it);
   @override
-  int get hashCode =>
-      name.hashCode +
-      children.map((child) => child.hashCode).fold(0, (a, b) => a + b);
+  int get hashCode => children
+      .map((child) => child.hashCode)
+      .fold(name.hashCode, (a, b) => a ^ b);
 
   @override
   String toString() {
@@ -72,7 +75,7 @@ class _TypeParser {
       name.write(current);
       advance();
     }
-    if (name.isEmpty) return null;
+    if (name.isEmpty) throw FormatException("Type '$string' has no name");
     if (current == '>' || current == ',') {
       return RichType(name.toString());
     }
@@ -81,7 +84,9 @@ class _TypeParser {
         advance();
         types.add(parse());
       }
-      if (current != '>') return null;
+      if (current != '>') {
+        throw FormatException("'>' expected in '$string' at position $current");
+      }
       advance();
     }
     return RichType(name.toString(), types);

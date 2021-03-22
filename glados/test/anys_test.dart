@@ -47,5 +47,26 @@ void main() {
         expect(number, lessThan(2 << 64));
       });
     });
+    group('ListAnys', () {
+      Glados(any.listWithLengthInRange(null, null, any.always(42)))
+          .test('listWithLengthInRange(null, null, ...)', (list) {
+        expect(list, everyElement(equals(42)));
+      });
+      Glados(any.listWithLengthInRange(5, 10, any.bigInt))
+          .test('listWithLengthInRange(5, 10, ...)', (list) {
+        expect(list.length, greaterThanOrEqualTo(5));
+        expect(list.length, lessThan(10));
+      });
+    });
+    group('SetAnys', () {
+      Glados(any.setWithLengthInRange(null, null, any.always(42)))
+          .test('setWithLengthInRange(null, null, ...)', (set) {
+        expect(set, equals({42}));
+      });
+      Glados(any.setWithLengthInRange(5, 10, any.bigInt))
+          .test('setWithLengthInRange(5, 10, ...)', (set) {
+        expect(set.length, lessThan(10));
+      });
+    });
   });
 }
