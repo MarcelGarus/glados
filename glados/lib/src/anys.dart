@@ -33,7 +33,6 @@ extension IntAnys on Any {
   Generator<core.int> get uint8 => intInRange(0, 2 << 8);
   Generator<core.int> get uint16 => intInRange(0, 2 << 16);
   Generator<core.int> get uint32 => intInRange(0, 2 << 32);
-  Generator<core.int> get uint64 => intInRange(0, 2 << 64);
   Generator<core.int> get int8 => intInRange(-(2 << 7) - 1, 2 << 7);
   Generator<core.int> get int16 => intInRange(-(2 << 15) - 1, 2 << 15);
   Generator<core.int> get int32 => intInRange(-(2 << 31) - 1, 2 << 31);
