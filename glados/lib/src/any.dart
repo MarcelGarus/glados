@@ -23,12 +23,20 @@ class Any {
   static final _defaults = <_TypeWrapper<dynamic>, Generator<dynamic>>{
     ..._defaultGenerators
   };
-  static void setDefault<T>(Generator<T> generator) =>
-      _defaults[_TypeWrapper<T>()] = generator;
-  static Generator<T> defaultFor<T>() =>
-      (_defaults[_TypeWrapper<T>()] as Generator<T>?) ?? (throw InternalNoGeneratorFound());
+
+  static void setDefault<T>(Generator<T> generator) {
+    _defaults[_TypeWrapper<T>()] = generator;
+  }
+
+  static Generator<T> defaultFor<T>() {
+    return (_defaults[_TypeWrapper<T>()] as Generator<T>?) ??
+        (throw InternalNoGeneratorFound());
+  }
+
   static Generator<T> defaultForWithBeautifulError<T>(
-      int numGladosArgs, int typeIndex) {
+    int numGladosArgs,
+    int typeIndex,
+  ) {
     try {
       return defaultFor<T>();
     } on InternalNoGeneratorFound {
@@ -344,7 +352,9 @@ class ShrinkableCombination<T> implements Shrinkable<T> {
   final T Function(List<dynamic> values) combiner;
 
   @override
-  T get value => combiner(fields.map((shrinkable) => shrinkable.value).toList());
+  T get value {
+    return combiner(fields.map((shrinkable) => shrinkable.value).toList());
+  }
 
   @override
   Iterable<Shrinkable<T>> shrink() sync* {

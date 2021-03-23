@@ -113,7 +113,10 @@ extension ListAnys on Any {
     final actualMin = min ?? 0;
     assert(actualMin >= 0);
     return (random, size) {
-      final length = random.nextIntInRange(actualMin, math.max(max ?? size, actualMin + 1));
+      final length = random.nextIntInRange(
+        actualMin,
+        math.max(max ?? size, actualMin + 1),
+      );
       return ShrinkableList(<Shrinkable<T>>[
         for (var i = 0; i < length; i++) itemGenerator(random, size),
       ], actualMin);
@@ -160,7 +163,10 @@ extension SetAyns on Any {
     final actualMin = min ?? 0;
     assert(actualMin >= 0);
     return (random, size) {
-      final length = random.nextIntInRange(actualMin, math.max(max ?? size, actualMin + 1));
+      final length = random.nextIntInRange(
+        actualMin,
+        math.max(max ?? size, actualMin + 1),
+      );
       return ShrinkableSet(<Shrinkable<T>>{
         for (var i = 0; i < length; i++) itemGenerator(random, size),
       }, actualMin);

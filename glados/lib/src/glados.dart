@@ -252,7 +252,11 @@ class Glados2<First, Second> {
     int? retry,
   }) {
     Glados(
-      any.combine2(firstGenerator, secondGenerator, (First a, Second b) => [a, b]),
+      any.combine2(
+        firstGenerator,
+        secondGenerator,
+        (First a, Second b) => [a, b],
+      ),
     ).test(
       description,
       (input) => body(input[0] as First, input[1] as Second),

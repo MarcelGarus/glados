@@ -18,7 +18,7 @@ class Text extends StructuredText {
     for (var i = 0; i < words.length; i++) {
       final word = words[i];
       if (line.length + (i == 0 ? 0 : 1) + word.length <= width) {
-        if (i > 0) line..write(' ');
+        if (i > 0) line.write(' ');
         line.write(word);
       } else {
         yield line.toString();
