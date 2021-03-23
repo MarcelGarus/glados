@@ -17,14 +17,21 @@ extension BoolAny on Any {
 
 extension IntAnys on Any {
   /// A generator for [int]s. [min] is inclusive, [max] is exclusive.
-  Generator<core.int> intInRange(core.int? min, core.int? max) => simple(
-        generate: (random, size) =>
-            random.nextIntInRange(min ?? -size, max ?? size),
-        shrink: (input) sync* {
-          if (input > 0 && input > (min ?? 0)) yield input - 1;
-          if (input < 0 && input < (max ?? 0)) yield input + 1;
-        },
-      );
+  Generator<core.int> intInRange(core.int? min, core.int? max) {
+    if (min != null && max != null) assert(min < max);
+    return simple(
+      generate: (random, size) {
+        final actualMin = min ?? (max == null ? -size : (max - size - 1));
+        final actualMax = max ?? (min == null ? size : (min + size + 1)) + 1;
+        return random.nextIntInRange(actualMin, actualMax);
+      },
+      shrink: (input) sync* {
+        if (input > 0 && input > (min ?? 0)) yield input - 1;
+        if (input < 0 && input < (max ?? 0)) yield input + 1;
+      },
+    );
+  }
+
   Generator<core.int> get int => intInRange(null, null);
   Generator<core.int> get positiveInt => intInRange(1, null);
   Generator<core.int> get positiveIntOrZero => intInRange(0, null);
