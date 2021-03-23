@@ -162,6 +162,9 @@ class ShrinkableList<T> implements Shrinkable<core.List<T>> {
       }
     }
   }
+
+  @core.override
+  core.String toString() => 'ShrinkableList<$T>($items, minLength: $minLength)';
 }
 
 extension SetAyns on Any {
@@ -213,6 +216,9 @@ class ShrinkableSet<T> implements Shrinkable<core.Set<T>> {
       }
     }
   }
+
+  @core.override
+  core.String toString() => 'ShrinkableSet<$T>($items, minLength: $minLength)';
 }
 
 extension DateTimeAnys on Any {

@@ -31,6 +31,9 @@ class ShrinkableRichType implements Shrinkable<RichType> {
       }
     }
   }
+
+  @override
+  String toString() => 'ShrinkableRichType($value)';
 }
 
 void main() {

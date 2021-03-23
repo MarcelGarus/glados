@@ -34,6 +34,9 @@ class _InlineShrinkableValue<T> implements Shrinkable<T> {
 
   @override
   Iterable<Shrinkable<T>> shrink() => _shrinker();
+
+  @override
+  String toString() => 'Shrinkable$T($value)';
 }
 
 /// Useful methods on [Generator]s.
