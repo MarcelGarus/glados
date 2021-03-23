@@ -249,4 +249,12 @@ extension StringAnys on Any {
   Generator<core.String> get letters => stringOf(_letters);
   Generator<core.String> get digits => stringOf(_digits);
   Generator<core.String> get letterOrDigits => stringOf(_lettersOrDigits);
+  Generator<core.String> get nonEmptyLowercaseLetters =>
+      nonEmptyStringOf(_lowercaseLetters);
+  Generator<core.String> get nonEmptyUppercaseLetters =>
+      nonEmptyStringOf(_uppercaseLetters);
+  Generator<core.String> get nonEmptyLetters => nonEmptyStringOf(_letters);
+  Generator<core.String> get nonEmptyDigits => nonEmptyStringOf(_digits);
+  Generator<core.String> get nonEmptyLetterOrDigits =>
+      nonEmptyStringOf(_lettersOrDigits);
 }
