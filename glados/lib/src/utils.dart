@@ -26,7 +26,20 @@ extension RandomUtils on Random {
   T choose<T>(List<T> list) => list[nextInt(list.length)];
   int nextIntInRange(int min, int max) {
     assert(min < max);
-    return nextInt(max - min) + min;
+    return _nextIntUpTo(max - min) + min;
+  }
+
+  int _nextIntUpTo(int max) {
+    // `Random`'s `nextInt` can only generate numbers up to 2^32. If we want a
+    // bigger number, we'll have to first generate the upper bits and then the
+    // lower ones.
+    if (max < 1 << 32) {
+      return nextInt(max);
+    } else {
+      final upperPart = nextInt(max >> 32);
+      final lowerPart = nextInt(1 << 32);
+      return (upperPart << 32 + lowerPart) % max;
+    }
   }
 
   Random nextRandom() => Random(nextInt(1234567890));
