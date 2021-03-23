@@ -232,16 +232,21 @@ extension MapAnys on Any {
 }
 
 extension StringAnys on Any {
+  static final _lowercaseLetters = 'abcdefghijklmnopqrstuvwxyz';
+  static final _uppercaseLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  static final _digits = '0123456789';
+  static final _letters = '$_lowercaseLetters$_uppercaseLetters';
+  static final _lettersOrDigits = '$_letters$_digits';
+
   Generator<core.String> stringOf(core.String chars) =>
       list(choose(chars.characters.toList()))
           .map((listOfChars) => listOfChars.join());
-  Generator<core.String> get lowercaseLetter =>
-      stringOf('abcdefghijklmnopqrstuvwxyz');
-  Generator<core.String> get uppercaseLetter =>
-      stringOf('ABCDEFGHIJKLMNOPQRSTUVWXYZ');
-  Generator<core.String> get letter =>
-      stringOf('aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwWxXyYzZ');
-  Generator<core.String> get digit => stringOf('0123456789');
-  Generator<core.String> get letterOrDigit => stringOf(
-      'aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwWxXyYzZ0123456789');
+  Generator<core.String> nonEmptyStringOf(core.String chars) =>
+      nonEmptyList(choose(chars.characters.toList()))
+          .map((listOfChars) => listOfChars.join());
+  Generator<core.String> get lowercaseLetters => stringOf(_lowercaseLetters);
+  Generator<core.String> get uppercaseLetters => stringOf(_uppercaseLetters);
+  Generator<core.String> get letters => stringOf(_letters);
+  Generator<core.String> get digits => stringOf(_digits);
+  Generator<core.String> get letterOrDigits => stringOf(_lettersOrDigits);
 }
