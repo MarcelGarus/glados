@@ -24,20 +24,6 @@ void main() {
           list.where((it) => it >= 0).length);
     });
 
-
-class User {
-  User.blub(
-    this.email,
-    this.password, {
-    this.age,
-    this.foo,
-    this.bar,
-    this.baz,
-    this.blubbel,
-    this.schub,
-    this.shooze,
-    this.whooze,
-    this.zoooooome,
     Glados<List<int>>().test('is only null if the list is empty', (list) {
       if (max(list) == null) {
         expect(list, isEmpty);
@@ -53,24 +39,4 @@ class User {
       }
     });
   });
-
-  final String email;
-  final String password;
-  final int age;
-  final Duration foo;
-  final double bar;
-  final DateTime baz;
-  final BigInt blubbel;
-  final int schub;
-  final int shooze;
-  final bool whooze;
-  final bool zoooooome;
-
-  int get doubleAge => age * 2;
-}
-
-enum Ripeness {
-  ripe,
-  medium,
-  unripe,
 }
