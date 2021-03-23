@@ -1,11 +1,11 @@
 |   |   |
 | - | - |
-| <p>Testing is tedious! At least that's what I thought before I stumbled over **property-based testing** – a simple approach that allows you to write fewer tests yet gain more confidence in your code.</p><p>In traditional testing, you define concrete inputs and test whether they result in the desired output. In property based testing, you define certain conditions that are always true for any input (those are called *properties*). In mathematics, there's the ∀ operator for that. In Dart, now there's Glados.</p> | <img src="https://raw.githubusercontent.com/marcelgarus/glados/main/glados.webp"> |
+| <p>Testing is tedious! At least that's what I thought before I stumbled over **property-based testing** – a simple approach that allows you to write fewer tests yet gain more confidence in your code.</p><p>In traditional testing, you define concrete inputs and test whether they result in the desired output. In property-based testing, you define certain conditions that are always true for any input (those are called *properties*). In mathematics, there's the ∀ operator for that. In Dart, now there's Glados.</p> | <img src="https://raw.githubusercontent.com/marcelgarus/glados/main/glados.webp"> |
 
 Here are some benefits:
 
 - ⚡ **Write fewer tests.** Let Glados figure out inputs that break your properties.
-- 🌌 **Test for all possible inputs.** Well, not literally all. But a huge variety.
+- 🌌 **Test for all possible inputs.** Well, not all. But a wide variety.
 - 🐜 **Get a concise error report.** Glados simplifies inputs that break your tests.
 - 🤯 **Understand the problem domain better** by thinking of properties.
 
@@ -25,7 +25,7 @@ Here are some benefits:
 
 ## Quickstart
 
-```yml
+```yaml
 dev_dependencies:
   test: ...
   glados: ...
@@ -34,7 +34,7 @@ dev_dependencies:
 Use `Glados<...>().test(...)` instead of the traditional `test(...)`.
 
 ```dart
-// Running this test shows you that it fails for the input 21.
+// Running this test shows you that it fails for input 21.
 Glados<int>().test((a) {
   expect(a * 2, lessThan(42));
 });
@@ -53,7 +53,7 @@ Glados(any.lowercaseLetter).test((letter) { ... });
 Glados(any.nonEmptyList(any.positiveIntOrZero)).test((list) { ... });
 ```
 
-You want to test with your own data classes? [Here's how to write generators.](#how-to-write-generators).
+Do you want to test with *your* data classes? [Here's how to write generators.](#how-to-write-generators).
 
 You can also [customize the size of the generated inputs](#customizing-the-exploration-phase).
 
@@ -61,10 +61,10 @@ You can also [customize the size of the generated inputs](#customizing-the-explo
 
 Suppose you write a function that tries to find the maximum in a list.
 I know – that's pretty basic – but it's enough to get you started.
-Here's an obviously wrong implementation:
+Here's a wrong implementation:
 
 ```dart
-/// If the list is empty, return null, otherwise the biggest item.
+/// If the list is empty, return null, otherwise the biggest number.
 int max(List<int> input) => null;
 ```
 
@@ -117,7 +117,7 @@ int max(List<int> input) => 42;
 ```
 
 We need to add another property test to reject this function as well.
-Arguably the most obvious property for `max` is the following: The maximum should be greater than or equal to all items of the list:
+Arguably the most prominent property for `max` is the following: The maximum should be greater than or equal to all items of the list:
 
 ```dart
 Glados(any.nonEmptyList(any.int)).test('maximum is >= all items', (list) {
@@ -128,7 +128,7 @@ Glados(any.nonEmptyList(any.int)).test('maximum is >= all items', (list) {
 });
 ```
 
-Instead of defining type parameters, you can also pass in *generators* to Glados to customize which values are generated.
+Instead of defining type parameters, you can also pass in *generators* to Glados to customize which values it generates.
 You can find all available generators as fields on the `any` value.
 In this case, we only test with non-empty lists because we handled the empty list in the first test.
 
@@ -142,7 +142,7 @@ Failing for input: [43]
 
 Glados detected that the property breaks if the input list contains a `43`.
 
-Let's actually add a more reasonable implementation for `max`:
+Let's add a more practical implementation for `max`:
 
 ```dart
 int max(List<int> input) {
@@ -159,7 +159,7 @@ int max(List<int> input) {
 }
 ```
 
-This fixes the tests, but still doesn't work for lists containing only negative values.
+That change fixes the tests but still doesn't work for lists containing only negative values.
 So, let's add a final test:
 
 ```dart
@@ -172,11 +172,11 @@ I'll leave implementing the function correctly to you, the reader.
 
 But whatever solution you come up with, it'll be correct:
 Our tests aren't merely some arbitrary examples anymore.
-Rather, they correspond to the **actual mathematical definition of max**.
+Instead, they correspond to the **actual mathematical definition of max**.
 
 ## How to find properties
 
-Finding properties can seem difficult at times, but you'll get better at finding them and you can start with obvious ones first.
+Finding properties can seem difficult at times, but you'll get better at finding them, and you can start with obvious ones first.
 They don't have to be perfect – testing a few simple properties can still be better than traditional unit tests.
 
 To get you started, here are a bunch of patterns that can help you to find properties:
@@ -193,18 +193,18 @@ To get you started, here are a bunch of patterns that can help you to find prope
 
 Glados works in two phases:
 
-- 🌍 **The exploration phase**: Glados generates increasingly complex, random inputs until one breaks the property or the maximum number of runs is reached.
-- 🐜 **The shrinking phase**: This phase only happens if Glados found an input that breaks the property. In this case, the input is gradually simplified and the smallest input that's still breaking the property is returned.
+- 🌍 **The exploration phase**: Glados generates increasingly complex, random inputs until one breaks the property or Glados reaches the maximum number of runs.
+- 🐜 **The shrinking phase**: This phase only happens if Glados found an input that breaks the property. In this case, it gradually simplifies the input and returns the smallest input that's still breaking the property.
 
 Generators are responsible for generating code. `Generator<T>` is simply a function that takes a `random` and `size` and produces a `Shrinkable<T>`.
 The `random` parameter should be used as the only source of randomness to guarantee reproducibility when running tests multiple times.
-The `size` parameter is used as a rough estimate on how big or complex the returned value should be.
+The `size` parameter indicates a rough estimate of how complex the returned value should be.
 For example, the generator for `int` produces `int`s in the range from `-size` to `size`.
 
-`Shrinkable<T>` is just a wrapper around a `T` (it has a `value` getter for that). It also has a `shrink` method, which produces an `Iterable` of `Shrinkable<T>` values, which are similar to the current value, but smaller.
-Smaller means that if you would call `shrink` repeatedly on the smaller values and their children, grand-children etc., the program should eventually terminate (aka the transitive hull with regard to `shrink` should be finite and acyclic).
+`Shrinkable<T>` is just a wrapper around a `T` (it has a `value` getter for that). It also has a `shrink` method, which produces an `Iterable` of `Shrinkable<T>` values similar to the current value but smaller.
+Smaller means that if you would call `shrink` repeatedly on the smaller values and their children, grandchildren, etc., the program should eventually terminate (aka the transitive hull concerning `shrink` should be finite and acyclic).
 
-The basic types all have corresponding generators implemented. All generators can be found on `any`.
+The basic types all have corresponding generators implemented. You can find all generators on `any`.
 
 ## How to write generators
 
@@ -234,7 +234,7 @@ extension AnyRipeness on Any {
 ```
 
 If you want to customize generators further, like only generate valid email addresses, you might need to work on a lower level of abstraction.
-Just check out the source code of exisitng generators for some examples.
+Just check out the source code of existing generators for some examples.
 
 Here's how to set a generator as the default generator for a type:
 
@@ -247,10 +247,9 @@ Glados<String>().test('blub', (email) { ... });
 
 ## Customizing the exploration phase
 
-You can also customize the exploration phase.
-To do that, you can use `Explore`, which is a configuration for certain values used during that phase.
+You can also customize the exploration phase by customizing the `ExploreConfig`.
 
-For example, if you want to test some code with very big inputs, you might adjust `Explore`'s parameters so that Glados starts with very big inputs and generates much bigger inputs after just a few runs:
+For example, if you want to test some code with massive inputs, you might adjust `ExploreConfig`'s parameters so that Glados starts with already massive inputs and generates much bigger inputs after just a few runs:
 
 ```dart
 Glados(any.email, Explore(
@@ -262,14 +261,15 @@ Glados(any.email, Explore(
 });
 ```
 
-`Explore` also has a `random` parameter, which you can provide with a custom `Random` instance.
-By default, `Explore` uses a `Random` instance created with a fixed seed so that your tests are deterministic.
+`ExploreConfig` also has a `random` parameter, which you can provide with a custom `Random` instance.
+By default, `ExploreConfig` uses a `Random` instance created with a fixed seed so that your tests are deterministic.
 
 ## What's up with the name?
 
-GLaDOS is a very nice robot in the Portal game series. She's the head of the Aperture Science Laboratory facilities, where she spends the rest of her days testing. So I thought that's quite a fitting name. 🥔
+GLaDOS is a charming robot in the Portal game series. She's the head of the Aperture Science Laboratory facilities, where she spends the rest of her days testing. So I thought that's quite a fitting name. 🥔
 
-By the way, both Portal games are great. If you haven't played them, definitely [check them out](https://store.steampowered.com/app/400/Portal/).
+By the way, both Portal games are great.
+If you haven't played them, definitely [check them out](https://store.steampowered.com/app/400/Portal/).
 
 ## Further info & resources
 
