@@ -3,15 +3,17 @@ import 'package:glados/src/rich_type.dart';
 import 'package:test/test.dart';
 
 extension AnyRichType on Any {
-  Generator<RichType> get richType => (random, size) {
-        return ShrinkableRichType(
-          letter(random, size),
-          // This getter doesn't return itself, but a lambda which – if
-          // invoked – returns it.
-          // ignore: recursive_getters
-          any.list(richType)(random, size - 1),
-        );
-      };
+  Generator<RichType> get richType {
+    return (random, size) {
+      return ShrinkableRichType(
+        nonEmptyLetters(random, size),
+        // This getter doesn't return itself, but a lambda which – if invoked –
+        // non-deterministically runs the getter again.
+        // ignore: recursive_getters
+        any.list(richType)(random, size ~/ 2),
+      );
+    };
+  }
 }
 
 class ShrinkableRichType implements Shrinkable<RichType> {

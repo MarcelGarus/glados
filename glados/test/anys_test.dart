@@ -8,15 +8,22 @@ void main() {
       Glados3(any.int, any.int, any.int).testWithRandom(
         'intInRange',
         (size, min, max, random) {
-          final generated = any.intInRange(min, max)(random, size);
+          if (min >= max) {
+            expect(
+              () => any.intInRange(min, max)(random, size),
+              throwsA(anything),
+            );
+            return;
+          }
+          final generated = any.intInRange(min, max)(random, size).value;
           expect(generated, greaterThanOrEqualTo(min));
-          expect(generated, lessThan(min));
+          expect(generated, lessThan(max));
         },
       );
-      Glados(any.int).testWithRandom('int', (size, random) {
-        final generated = any.int(random, size);
+      Glados(any.positiveIntOrZero).testWithRandom('int', (size, random) {
+        final generated = any.int(random, size).value;
         expect(generated, greaterThanOrEqualTo(-size));
-        expect(generated, lessThan(size));
+        expect(generated, lessThanOrEqualTo(size));
       });
       Glados(any.positiveInt).test('positiveInt', (number) {
         expect(number, greaterThan(0));
@@ -34,17 +41,13 @@ void main() {
         expect(number, greaterThanOrEqualTo(0));
         expect(number, lessThan(2 << 8));
       });
-      Glados(any.uint8).test('uint16', (number) {
+      Glados(any.uint16).test('uint16', (number) {
         expect(number, greaterThanOrEqualTo(0));
         expect(number, lessThan(2 << 16));
       });
-      Glados(any.uint8).test('uint32', (number) {
+      Glados(any.uint32).test('uint32', (number) {
         expect(number, greaterThanOrEqualTo(0));
         expect(number, lessThan(2 << 32));
-      });
-      Glados(any.uint8).test('uint64', (number) {
-        expect(number, greaterThanOrEqualTo(0));
-        expect(number, lessThan(2 << 64));
       });
     });
     group('ListAnys', () {
@@ -61,7 +64,9 @@ void main() {
     group('SetAnys', () {
       Glados(any.setWithLengthInRange(null, null, any.always(42)))
           .test('setWithLengthInRange(null, null, ...)', (set) {
-        expect(set, equals({42}));
+        if (set.isNotEmpty) {
+          expect(set, equals({42}));
+        }
       });
       Glados(any.setWithLengthInRange(5, 10, any.bigInt))
           .test('setWithLengthInRange(5, 10, ...)', (set) {
