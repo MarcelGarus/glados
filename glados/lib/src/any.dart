@@ -1,7 +1,5 @@
 import 'dart:math';
 
-import 'package:meta/meta.dart';
-
 import 'anys.dart';
 import 'errors.dart';
 import 'generator.dart';

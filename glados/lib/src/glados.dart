@@ -15,11 +15,8 @@ class ExploreConfig {
     this.initialSize = 10,
     this.speed = 1,
     Random? random,
-  })  : assert(numRuns != null),
-        assert(numRuns > 0),
-        assert(initialSize != null),
+  })  : assert(numRuns > 0),
         assert(initialSize > 0),
-        assert(speed != null),
         assert(speed >= 0),
         random = random ?? Random(42);
 
