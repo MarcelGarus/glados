@@ -1,11 +1,11 @@
 name: tuple_glados
 description: "Provides Glados arbitraries for types from the tuple package."
-version: 0.1.0
+version: 1.0.0
 repository: https://github.com/marcelgarus/glados
 
 environment:
-  sdk: ">=2.8.0 <3.0.0"
+  sdk: ">=2.12.0 <3.0.0"
 
 dependencies:
-  tuple: ^1.0.3
-  glados: ^0.1.6
+  tuple: ^2.0.0
+  glados: ^1.0.0
