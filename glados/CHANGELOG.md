@@ -1,3 +1,9 @@
+## 1.0.1
+
+* Document all generators.
+* Add `any.positiveDouble` and `any.negativeDoubleOrZero`.
+* Fix off-by-one-errors in `int8`, `int16`, `int32`.
+
 ## 1.0.0
 
 * The API is now stable!
@@ -6,7 +12,7 @@
 * Fix many typos in this changelog.
 * Rename `any.letter` to `any.letters`, `any.uppercaseLetter` to `any.uppercaseLetters`, `any.lowercaseLetter` to `any.lowercaseLetters`, and `any.digit` to `any.digits`.
 * Add `any.nonEmptyStringOf`, `any.nonEmptyLetters`, `any.nonEmptyUppercaseLetters`, `any.nonEmptyLowercaseLetters`, and `any.nonEmptyDigits`.
-* Remove `any.uint64`, because integers are always int64.
+* Remove `any.uint64` because integers are always int64.
 * Fixed bug when attempting to generate ints larger than 2^32.
 * Directly export 'package:test/test.dart', so that you don't have to do so manually.
 

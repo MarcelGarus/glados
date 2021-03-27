@@ -41,21 +41,17 @@ class _InlineShrinkableValue<T> implements Shrinkable<T> {
 
 /// Useful methods on [Generator]s.
 extension GeneratorUtils<T> on Generator<T> {
-  /// Returns [null] in 10 % of cases.
-  // Generator<T> get orNull => any.arbitrary(
-  //       generate: (random, size) =>
-  //           random.nextDouble() < 0.1 ? null : this.generate(random, size),
-  //       shrink: (value) sync* {
-  //         if (value != null) {
-  //           yield* this.shrink(value);
-  //         }
-  //       },
-  //     );
-
   Generator<R> map<R>(R Function(T value) mapper) {
     return (random, size) {
       final value = this(random, size);
       return MappedShrinkableValue<T, R>(value, mapper);
+    };
+  }
+
+  Generator<T?> get nullable {
+    return (random, size) {
+      final value = this(random, size);
+      return NullableShrinkableValue(value);
     };
   }
 }
@@ -74,5 +70,23 @@ class MappedShrinkableValue<T, R> implements Shrinkable<R> {
     return originalValue.shrink().map((value) {
       return MappedShrinkableValue(value, mapper);
     });
+  }
+}
+
+class NullableShrinkableValue<T> implements Shrinkable<T?> {
+  NullableShrinkableValue(this.originalValue);
+
+  final Shrinkable<T> originalValue;
+
+  @override
+  T? get value => originalValue.value;
+
+  @override
+  Iterable<Shrinkable<T?>> shrink() {
+    final shrinkableNull = Shrinkable<T?>(null, () => []);
+    return originalValue
+        .shrink()
+        .cast<Shrinkable<T?>>()
+        .followedBy([shrinkableNull]);
   }
 }
