@@ -65,7 +65,7 @@ Here's a wrong implementation:
 
 ```dart
 /// If the list is empty, return null, otherwise the biggest number.
-int max(List<int> input) => null;
+int? max(List<int> input) => null;
 ```
 
 To be sure that the function does the right thing, you might want to write some tests.
@@ -113,7 +113,7 @@ Glados discovered that a list with some content breaks the condition!
 Let's modify our `max` function to pass this test:
 
 ```dart
-int max(List<int> input) => 42;
+int? max(List<int> input) => 42;
 ```
 
 We need to add another property test to reject this function as well.
@@ -217,7 +217,7 @@ class User {
 }
 
 extension AnyUser on Any {
-  Generator<User> get user => combine3(any.string, any.int, (name, age) {
+  Generator<User> get user => combine2(any.string, any.int, (name, age) {
     return User(name, age);
   });
 }
@@ -247,12 +247,12 @@ Glados<String>().test('blub', (email) { ... });
 
 ## Customizing the exploration phase
 
-You can also customize the exploration phase by customizing the `ExploreConfig`.
+You can configure the exploration phase by customizing the `ExploreConfig`.
 
 For example, if you want to test some code with massive inputs, you might adjust `ExploreConfig`'s parameters so that Glados starts with already massive inputs and generates much bigger inputs after just a few runs:
 
 ```dart
-Glados(any.email, Explore(
+Glados(any.email, ExploreConfig(
   initialSize: 100, // Start quite big
   speed: 10,        // and increase the input size by 10 each run,
   numRuns: 10,      // but only do 10 runs instead of 100.
