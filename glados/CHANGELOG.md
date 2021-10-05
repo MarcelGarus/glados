@@ -1,3 +1,8 @@
+## 1.0.2
+
+* Update dependencies.
+* Thanks to @t1000!
+
 ## 1.0.1
 
 * Document all generators.
