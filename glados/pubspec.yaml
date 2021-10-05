@@ -1,11 +1,11 @@
 name: glados
-description: "🍰 A simple testing framework that tries to break your properties."
-version: 1.0.0
+description: '🍰 A simple testing framework that tries to break your properties.'
+version: 1.0.2
 
 repository: https://github.com/marcelgarus/glados
 
 environment:
-  sdk: ">=2.12.0 <3.0.0"
+  sdk: '>=2.12.0 <3.0.0'
 
 dependencies:
   analyzer: ^2.3.0
