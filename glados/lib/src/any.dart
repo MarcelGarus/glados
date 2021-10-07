@@ -86,7 +86,7 @@ extension AnyUtils on Any {
         'The list of values given to any.choice contains duplicate items.');
     return simple(
       generate: (random, size) => values[random.nextInt(
-        size.clamp(0, values.length - 1),
+        size.clamp(0, values.length),
       )],
       shrink: (option) sync* {
         final index = values.indexOf(option);
