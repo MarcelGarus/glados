@@ -1,7 +1,13 @@
+## 1.0.3
+
+* Fix typos in readme.
+* Fix bug in `any.choose`.
+* Thanks to @t1ooo!
+
 ## 1.0.2
 
 * Update dependencies.
-* Thanks to @t1000!
+* Thanks to @t1ooo!
 
 ## 1.0.1
 
