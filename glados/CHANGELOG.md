@@ -1,3 +1,9 @@
+## 1.0.4
+
+* Add `bind` extension to generators
+* Add `oneOf` generator
+* Rewrite `either` to use `oneOf` generator
+
 ## 1.0.3
 
 * Fix typos in readme.
