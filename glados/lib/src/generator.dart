@@ -48,6 +48,10 @@ extension GeneratorUtils<T> on Generator<T> {
     };
   }
 
+  Generator<R> bind<R>(Generator<R> Function(T value) mapper) {
+    return (random, size) => map(mapper)(random, size).value(random, size);
+  }
+
   Generator<T?> get nullable {
     return (random, size) {
       final value = this(random, size);
