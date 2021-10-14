@@ -13,8 +13,7 @@ class RichType {
     }
     return type;
   }
-  RichType(this.name, [this.children = const []])
-      : assert(name.isNotEmpty);
+  RichType(this.name, [this.children = const []]) : assert(name.isNotEmpty);
 
   final String name;
   final List<RichType> children;
