@@ -95,21 +95,41 @@ extension AnyUtils on Any {
     );
   }
 
-  /// Uses either the first or the second generator to generate a value.
-  Generator<T> either<T>(Generator<T> first, Generator<T> second) {
-    return oneOf([first, second]);
+  /// Uses either one of the provided generators to generate a value.
+  ///
+  /// See [oneOf] for a version of this method to be used if the number of
+  /// generators is not known at compile-time.
+  Generator<T> either<T>(
+    Generator<T> first,
+    Generator<T> second, [
+    Generator<T>? third,
+    Generator<T>? fourth,
+    Generator<T>? fifth,
+    Generator<T>? sixth,
+    Generator<T>? seventh,
+    Generator<T>? nineth,
+    Generator<T>? tenth,
+  ]) {
+    return oneOf([
+      first,
+      second,
+      if (third != null) third,
+      if (fourth != null) fourth,
+      if (fifth != null) fifth,
+      if (sixth != null) sixth,
+      if (seventh != null) seventh,
+      if (nineth != null) nineth,
+      if (tenth != null) tenth,
+    ]);
   }
 
   /// Uses one of the supplied generators to generate a value.
+  ///
+  /// See [either] for a version of this method if the number of generators is
+  /// known at compile-time.
   Generator<T> oneOf<T>(List<Generator<T>> generators) {
     return choose(generators).bind((generator) => generator);
   }
-
-// Generator<T> chooseWithFrequency<T>(Map<T, double> options) {
-//   return arbitrary(
-//     generate: (random, size) =>
-//   );
-// }
 }
 
 extension CombinableAny on Any {
