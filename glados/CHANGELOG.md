@@ -1,3 +1,9 @@
+## 1.1.1
+
+* Format internal `rich_type.dart` file correctly.
+* Update readme to be more contributor-friendly.
+* Thanks to @MikkelStorgaard!
+
 ## 1.1.0
 
 * Add `Generator.bind`.
