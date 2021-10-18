@@ -1,12 +1,19 @@
-## 1.0.4
+## 1.1.1
 
-* Add `bind` extension to generators
-* Add `oneOf` generator
-* Rewrite `either` to use `oneOf` generator
+* Format internal `rich_type.dart` file correctly.
+* Update readme to be more contributor-friendly.
+* Thanks to @MikkelStorgaard!
+
+## 1.1.0
+
+* Add `Generator.bind`.
+* Add `any.oneOf` generator.
+* Make `any.either` accept up to ten generators.
+* Thanks to @MikkelStorgaard!
 
 ## 1.0.3
 
-* Fix typos in readme.
+* Fix typos in the readme file.
 * Fix bug in `any.choose`.
 * Thanks to @t1ooo!
 
