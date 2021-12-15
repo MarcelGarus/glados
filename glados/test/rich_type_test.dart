@@ -1,6 +1,5 @@
 import 'package:glados/glados.dart';
 import 'package:glados/src/rich_type.dart';
-import 'package:test/test.dart';
 
 extension AnyRichType on Any {
   Generator<RichType> get richType {

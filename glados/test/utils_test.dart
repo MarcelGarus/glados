@@ -1,6 +1,5 @@
 import 'package:glados/glados.dart';
 import 'package:glados/src/utils.dart';
-import 'package:test/test.dart';
 
 void main() {
   group('RandomUtils', () {
@@ -26,9 +25,7 @@ void main() {
     });
     test('throwing', () async {
       expect(
-        await succeeds((_) {
-          throw 'blub';
-        }, true),
+        await succeeds((_) => throw 'blub', true),
         equals(false),
       );
     });

@@ -1,5 +1,4 @@
 import 'package:glados/glados.dart';
-import 'package:test/test.dart';
 
 void main() {
   group('Anys', () {
@@ -62,12 +61,14 @@ void main() {
       });
     });
     group('SetAnys', () {
+      // ignore: deprecated_member_use_from_same_package
       Glados(any.setWithLengthInRange(null, null, any.always(42)))
           .test('setWithLengthInRange(null, null, ...)', (set) {
         if (set.isNotEmpty) {
           expect(set, equals({42}));
         }
       });
+      // ignore: deprecated_member_use_from_same_package
       Glados(any.setWithLengthInRange(5, 10, any.bigInt))
           .test('setWithLengthInRange(5, 10, ...)', (set) {
         expect(set.length, lessThan(10));
