@@ -1,3 +1,8 @@
+## 1.1.2
+
+* Update dependencies.
+* Thanks to @MikkelStorgaard!
+
 ## 1.1.1
 
 * Format internal `rich_type.dart` file correctly.
