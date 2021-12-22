@@ -387,6 +387,7 @@ class ShrinkableCombination<T> implements Shrinkable<T> {
 }
 
 final _defaultGenerators = {
+  // ignore: prefer_void_to_null
   _TypeWrapper<Null>(): any.null_,
   _TypeWrapper<bool>(): any.bool,
   _TypeWrapper<int>(): any.int,

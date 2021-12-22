@@ -9,6 +9,7 @@ import 'utils.dart';
 
 extension NullAny on Any {
   /// A generator that only generates [null].
+  // ignore: prefer_void_to_null
   Generator<core.Null> get null_ => always(null);
 }
 
