@@ -1,3 +1,8 @@
+## 1.1.3
+
+* Update dependencies.
+* Thanks to @juliano!
+
 ## 1.1.2
 
 * Update dependencies.
