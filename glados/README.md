@@ -53,7 +53,7 @@ Glados(any.lowercaseLetter).test((letter) { ... });
 Glados(any.nonEmptyList(any.positiveIntOrZero)).test((list) { ... });
 ```
 
-Do you want to test with *your* data classes? [Here's how to write generators.](#how-to-write-generators).
+Do you want to test with *your* data classes? [Here's how.](#how-to-write-generators)
 
 You can also [customize the size of the generated inputs](#customizing-the-exploration-phase).
 
@@ -196,12 +196,12 @@ Glados works in two phases:
 - 🌍 **The exploration phase**: Glados generates increasingly complex, random inputs until one breaks the property or Glados reaches the maximum number of runs.
 - 🐜 **The shrinking phase**: This phase only happens if Glados found an input that breaks the property. In this case, it gradually simplifies the input and returns the smallest input that's still breaking the property.
 
-Generators are responsible for generating code. `Generator<T>` is simply a function that takes a `random` and `size` and produces a `Shrinkable<T>`.
+Generators are responsible for generating values. A `Generator<T>` is a function that takes a `random` and `size` and produces a `Shrinkable<T>`.
 The `random` parameter should be used as the only source of randomness to guarantee reproducibility when running tests multiple times.
 The `size` parameter indicates a rough estimate of how complex the returned value should be.
 For example, the generator for `int` produces `int`s in the range from `-size` to `size`.
 
-`Shrinkable<T>` is just a wrapper around a `T` (it has a `value` getter for that). It also has a `shrink` method, which produces an `Iterable` of `Shrinkable<T>` values similar to the current value but smaller.
+A `Shrinkable<T>` is a wrapper around a `T` (it has a `value` getter for that). It also has a `shrink` method, which produces an `Iterable` of `Shrinkable<T>` values similar to the current value but smaller.
 Smaller means that if you would call `shrink` repeatedly on the smaller values and their children, grandchildren, etc., the program should eventually terminate (aka the transitive hull concerning `shrink` should be finite and acyclic).
 
 The basic types all have corresponding generators implemented. You can find all generators on `any`.
