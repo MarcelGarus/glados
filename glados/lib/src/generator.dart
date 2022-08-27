@@ -24,7 +24,7 @@ abstract class Shrinkable<T> {
   Iterable<Shrinkable<T>> shrink();
 }
 
-/// An inline versions for the [Shrinkable].
+/// An inline version for the [Shrinkable].
 class _InlineShrinkableValue<T> implements Shrinkable<T> {
   _InlineShrinkableValue(this.value, this._shrinker);
 
@@ -36,7 +36,7 @@ class _InlineShrinkableValue<T> implements Shrinkable<T> {
   Iterable<Shrinkable<T>> shrink() => _shrinker();
 
   @override
-  String toString() => 'Shrinkable$T($value)';
+  String toString() => 'Shrinkable<$T>($value)';
 }
 
 /// Useful methods on [Generator]s.
