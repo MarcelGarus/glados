@@ -92,15 +92,13 @@ extension DoubleAnys on Any {
         return random.nextDouble() * (actualMax - actualMin) + actualMin;
       },
       shrink: (input) sync* {
-        // Turn 200 -> 199 -> 198 ... and 0.9 -> 0.8 -> 0.7 -> ...
-        for (var i = 1; i > 0.001; i ~/= 10) {
-          if (input > i && input > (min ?? 0)) yield input - i;
-          if (input < -i && input < (max ?? 0)) yield input + i;
-        }
+        // Turn 200 -> 199 -> 198 ...
+        if (input > 1 && input - 1 > (min ?? 0)) yield input - 1;
+        if (input < -1 && input + 1 < (max ?? 0)) yield input + 1;
         // Round to some digets.
         for (var i = 10; i < 100000; i *= 10) {
           final rounded = (input * i).round() / i;
-          if (rounded != i) yield rounded;
+          if (rounded != input) yield rounded;
         }
       },
     );
