@@ -1,3 +1,9 @@
+## 1.1.4
+
+- Fix the shrinking of `double`s.
+- Update dependencies.
+- Thanks to @andreilg and @jibbers42!
+
 ## 1.1.3
 
 - Update dependencies.
