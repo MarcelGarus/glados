@@ -1,5 +1,5 @@
 name: glados
-description: '🍰 A simple testing framework that tries to break your properties.'
+description: 'A simple testing framework that tries to break your properties.'
 version: 1.1.4
 
 repository: https://github.com/MarcelGarus/glados
