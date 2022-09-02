@@ -74,5 +74,22 @@ void main() {
         expect(set.length, lessThan(10));
       });
     });
+    group('BigIntAnys', () {
+      Glados3(any.int, any.bigInt, any.bigInt).testWithRandom(
+        'bigIntInRange',
+        (size, min, max, random) {
+          if (min >= max) {
+            expect(
+              () => any.bigIntInRange(min, max)(random, size),
+              throwsA(anything),
+            );
+            return;
+          }
+          final generated = any.bigIntInRange(min, max)(random, size).value;
+          expect(generated, greaterThanOrEqualTo(min));
+          expect(generated, lessThan(max));
+        },
+      );
+    });
   });
 }

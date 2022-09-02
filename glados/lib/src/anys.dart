@@ -145,9 +145,8 @@ extension BigIntAnys on Any {
       generate: (random, size) {
         final actualMin = min ?? core.BigInt.from(-size);
         final actualMax = max ?? core.BigInt.from(size);
-        final bits =
-            (core.BigInt.two * (actualMax - actualMin) + core.BigInt.one)
-                .bitLength;
+        assert(actualMax > actualMin);
+        final bits = (actualMax - actualMin).bitLength;
         var bigInt = core.BigInt.zero;
         for (var i = 0; i < bits; i++) {
           bigInt = bigInt * core.BigInt.two;
@@ -155,7 +154,7 @@ extension BigIntAnys on Any {
             bigInt += core.BigInt.one;
           }
         }
-        return bigInt - actualMin;
+        return bigInt % (actualMax - actualMin) + actualMin;
       },
       shrink: (input) sync* {
         if (input > core.BigInt.zero) {
