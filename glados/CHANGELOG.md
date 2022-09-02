@@ -1,3 +1,9 @@
+## 1.1.5
+
+- Fix the generation of `any.bigIntInRange`.
+- Update licenses to MIT.
+- Thanks to @Kharacternyk and @andreilg!
+
 ## 1.1.4
 
 - Fix the shrinking of `double`s.
