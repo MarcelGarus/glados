@@ -254,6 +254,7 @@ class Glados2<First, Second> {
         secondGenerator,
         (First a, Second b) => [a, b],
       ),
+      explore,
     ).test(
       description,
       (input) => body(input[0] as First, input[1] as Second),
@@ -323,12 +324,15 @@ class Glados3<First, Second, Third> {
     Map<String, dynamic>? onPlatform,
     int? retry,
   }) {
-    Glados(any.combine3(
-      firstGenerator,
-      secondGenerator,
-      thirdGenerator,
-      (First a, Second b, Third c) => [a, b, c],
-    )).test(
+    Glados(
+      any.combine3(
+        firstGenerator,
+        secondGenerator,
+        thirdGenerator,
+        (First a, Second b, Third c) => [a, b, c],
+      ),
+      explore,
+    ).test(
       description,
       (input) => body(input[0] as First, input[1] as Second, input[2] as Third),
       testOn: testOn,
