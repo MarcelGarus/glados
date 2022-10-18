@@ -1,3 +1,9 @@
+## 1.1.6
+
+- Fix passing `explore` to `Glados2` and `Glados3`.
+- Update dependencies.
+- Thanks to @MSCL!
+
 ## 1.1.5
 
 - Fix the generation of `any.bigIntInRange`.
