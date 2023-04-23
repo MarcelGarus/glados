@@ -46,13 +46,3 @@ jobs:
 
       - name: Run tests with coverage
         run: dart pub global run coverage:test_with_coverage
-
-      - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v3
-        with:
-          files: coverage/lcov.info
-
-      - name: Upload coverage reports to Coveralls
-        uses: coverallsapp/github-action@v2
-        with:
-          path-to-lcov: coverage/lcov.info
