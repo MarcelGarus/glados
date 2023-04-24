@@ -35,7 +35,7 @@ Use `Glados<...>().test(...)` instead of the traditional `test(...)`.
 
 ```dart
 // Running this test shows you that it fails for input 21.
-Glados<int>().test((a) {
+Glados<int>().test('number is less than 42', (a) {
   expect(a * 2, lessThan(42));
 });
 ```
@@ -43,14 +43,14 @@ Glados<int>().test((a) {
 You can test with multiple inputs.
 
 ```dart
-Glados2<String, int>().test((a, b) { ... });
+Glados2<String, int>().test('description', (a, b) { ... });
 ```
 
 Instead of using type parameters, you can customize inputs using `any`.
 
 ```dart
-Glados(any.lowercaseLetter).test((letter) { ... });
-Glados(any.nonEmptyList(any.positiveIntOrZero)).test((list) { ... });
+Glados(any.lowercaseLetter).test('description', (letter) { ... });
+Glados(any.nonEmptyList(any.positiveIntOrZero)).test('description', (list) { ... });
 ```
 
 Do you want to test with *your* data classes? [Here's how.](#how-to-write-generators)
