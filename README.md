@@ -1,3 +1,5 @@
+[![Analyze and test](https://github.com/MarcelGarus/glados/actions/workflows/analyze-and-test.yml/badge.svg)](https://github.com/MarcelGarus/glados/actions/workflows/analyze-and-test.yml)
+
 # Welcome to the Glados repository!
 
 This repository contains the `glados` core package, a property-based testing framework for Dart.
