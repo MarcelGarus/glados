@@ -1,3 +1,9 @@
+## 1.1.7
+
+- Update dependencies and remove unneeded ones.
+- Add CI.
+- Thanks to @greyhairredbear and @tjarvstrand!
+
 ## 1.1.6
 
 - Fix passing `explore` to `Glados2` and `Glados3`.
